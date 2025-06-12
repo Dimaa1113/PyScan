@@ -1,6 +1,7 @@
 # port_scanner/cli.py
 import argparse
 import sys
+import os # Import the os module
 from typing import List, Dict, Set
 
 # Attempt to import scanner functions from the main package
@@ -12,10 +13,7 @@ try:
         scan_ip_list_ports
     )
 except ImportError:
-    # This allows running cli.py directly for testing if port_scanner is in PYTHONPATH
-    # Or if cli.py is moved to the root and paths are adjusted.
-    # For proper package structure, the first import should work when installed.
-    sys.path.insert(0, sys.path[0] + "/..") # Go up one level to find port_scanner package
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from port_scanner import (
         scan_single_port,
         scan_multiple_ports,
@@ -35,7 +33,6 @@ def parse_ports(port_string: str) -> List[int]:
         for part in parts:
             part = part.strip()
             if not part:
-                # Raise error if a part is empty after stripping (e.g., "1," or "1,,2")
                 raise ValueError("Port segment cannot be empty.")
             if '-' in part:
                 start_str, end_str = part.split('-', 1)
@@ -67,64 +64,62 @@ def main():
     parser.add_argument("-p", "--ports", required=True, type=parse_ports,
                         help="Ports to scan. Can be a single port, comma-separated (80,443), or a range (1-1024).")
 
-    # Placeholder for future timeout option
-    # parser.add_argument("-t", "--timeout", type=float, default=1.0, help="Connection timeout in seconds for each port.")
+    parser.add_argument("-t", "--timeout", type=float, default=1.0,
+                        help="Connection timeout in seconds for each port (default: 1.0). Must be positive.")
 
     args = parser.parse_args()
 
+    if args.timeout <= 0:
+        parser.error("argument -t/--timeout: must be a positive number")
+
     ports_to_scan = args.ports
-    # The Cython timeout is currently fixed at 1.0s.
-    # If a timeout argument is added and plumbed through, it would be used here.
+    timeout_to_use = args.timeout
 
     results_dict: Dict[str, List[int]] = {}
     single_ip_open_ports: List[int] = []
 
-
     try:
         if args.ip:
-            print(f"Scanning {args.ip} for ports: {ports_to_scan}...")
-            # If only one port is specified and it's a single IP, use scan_single_port for slightly different handling
+            print(f"Scanning {args.ip} for ports: {ports_to_scan} (timeout: {timeout_to_use}s)...")
             if len(ports_to_scan) == 1:
-                if scan_single_port(args.ip, ports_to_scan[0]):
+                if scan_single_port(args.ip, ports_to_scan[0], timeout_seconds=timeout_to_use):
                     single_ip_open_ports = [ports_to_scan[0]]
             else:
-                single_ip_open_ports = scan_multiple_ports(args.ip, ports_to_scan)
+                single_ip_open_ports = scan_multiple_ports(args.ip, ports_to_scan, timeout_seconds=timeout_to_use)
 
-            if single_ip_open_ports: # Populate results_dict for consistent processing later if needed, though single IP is handled separately for output
+            if single_ip_open_ports:
                 results_dict[args.ip] = single_ip_open_ports
 
         elif args.ip_range:
-            print(f"Scanning IP range {args.ip_range} for ports: {ports_to_scan}...")
-            results_dict = scan_ip_range_ports(args.ip_range, ports_to_scan)
+            print(f"Scanning IP range {args.ip_range} for ports: {ports_to_scan} (timeout: {timeout_to_use}s)...")
+            results_dict = scan_ip_range_ports(args.ip_range, ports_to_scan, timeout_seconds=timeout_to_use)
 
         elif args.ip_list:
             ip_definitions = [item.strip() for item in args.ip_list.split(',')]
-            print(f"Scanning IP list {ip_definitions} for ports: {ports_to_scan}...")
-            results_dict = scan_ip_list_ports(ip_definitions, ports_to_scan)
+            print(f"Scanning IP list {ip_definitions} for ports: {ports_to_scan} (timeout: {timeout_to_use}s)...")
+            results_dict = scan_ip_list_ports(ip_definitions, ports_to_scan, timeout_seconds=timeout_to_use)
 
-    except ValueError as e: # Catch errors from the port_scanner library (e.g., invalid IP format)
+    except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
         print(f"An unexpected error occurred: {e}", file=sys.stderr)
         sys.exit(1)
 
-    # Check if any results were found (either in single_ip_open_ports or results_dict)
     if not single_ip_open_ports and not any(results_dict.values()):
         print("No open ports found for the specified targets and ports.")
         return
 
     print("\nScan Results:")
-    if args.ip: # Special handling for single IP for clearer output
+    if args.ip:
         if single_ip_open_ports:
             print(f"  Open ports on {args.ip}:")
             for port in single_ip_open_ports:
                 print(f"    - {port}")
-        else: # This case should be caught by the "No open ports found" check above, but as a fallback:
+        else:
             print(f"  No open ports found on {args.ip}.")
         return
 
-    # For ranges and lists
     for ip, open_ports in results_dict.items():
         if open_ports:
             print(f"  {ip}:")

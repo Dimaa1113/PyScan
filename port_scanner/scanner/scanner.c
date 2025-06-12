@@ -3,6 +3,7 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
+        "depends": [],
         "name": "scanner",
         "sources": [
             "/app/port_scanner/scanner/scanner.pyx"
@@ -1196,6 +1197,14 @@ static CYTHON_INLINE float __PYX_NAN() {
 #define __PYX_HAVE__scanner
 #define __PYX_HAVE_API__scanner
 /* Early includes */
+#include <stdint.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <sys/select.h>
+#include <errno.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -1464,6 +1473,13 @@ static const char *__pyx_f[] = {
   "scanner.pyx",
 };
 /* #### Code section: utility_code_proto_before_types ### */
+/* NoFastGil.proto */
+#define __Pyx_PyGILState_Ensure PyGILState_Ensure
+#define __Pyx_PyGILState_Release PyGILState_Release
+#define __Pyx_FastGIL_Remember()
+#define __Pyx_FastGIL_Forget()
+#define __Pyx_FastGilFuncInit()
+
 /* ForceInitThreads.proto */
 #ifndef __PYX_FORCE_INIT_THREADS
   #define __PYX_FORCE_INIT_THREADS 0
@@ -1474,6 +1490,32 @@ static const char *__pyx_f[] = {
 /* #### Code section: type_declarations ### */
 
 /*--- Type declarations ---*/
+struct __pyx_opt_args_7scanner_scan_ip_range;
+struct __pyx_opt_args_7scanner_scan_ip_list;
+
+/* "scanner.pyx":190
+ *     except ValueError: return []
+ *
+ * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
+ *     """
+ *     (Cython) Scans a range of IP addresses for specified ports.
+ */
+struct __pyx_opt_args_7scanner_scan_ip_range {
+  int __pyx_n;
+  double timeout_seconds;
+};
+
+/* "scanner.pyx":215
+ *     return results
+ *
+ * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
+ *     """
+ *     (Cython) Scans a list of IP addresses and/or IP ranges for specified ports.
+ */
+struct __pyx_opt_args_7scanner_scan_ip_list {
+  int __pyx_n;
+  double timeout_seconds;
+};
 /* #### Code section: utility_code_proto ### */
 
 /* --- Runtime support code (head) --- */
@@ -1801,81 +1843,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject
 #define __Pyx_PyObject_FastCall(func, args, nargs)  __Pyx_PyObject_FastCallDict(func, args, (size_t)(nargs), NULL)
 static CYTHON_INLINE PyObject* __Pyx_PyObject_FastCallDict(PyObject *func, PyObject **args, size_t nargs, PyObject *kwargs);
 
-/* decode_c_string_utf16.proto */
-static CYTHON_INLINE PyObject *__Pyx_PyUnicode_DecodeUTF16(const char *s, Py_ssize_t size, const char *errors) {
-    int byteorder = 0;
-    return PyUnicode_DecodeUTF16(s, size, errors, &byteorder);
-}
-static CYTHON_INLINE PyObject *__Pyx_PyUnicode_DecodeUTF16LE(const char *s, Py_ssize_t size, const char *errors) {
-    int byteorder = -1;
-    return PyUnicode_DecodeUTF16(s, size, errors, &byteorder);
-}
-static CYTHON_INLINE PyObject *__Pyx_PyUnicode_DecodeUTF16BE(const char *s, Py_ssize_t size, const char *errors) {
-    int byteorder = 1;
-    return PyUnicode_DecodeUTF16(s, size, errors, &byteorder);
-}
-
-/* decode_c_bytes.proto */
-static CYTHON_INLINE PyObject* __Pyx_decode_c_bytes(
-         const char* cstring, Py_ssize_t length, Py_ssize_t start, Py_ssize_t stop,
-         const char* encoding, const char* errors,
-         PyObject* (*decode_func)(const char *s, Py_ssize_t size, const char *errors));
-
-/* decode_bytes.proto */
-static CYTHON_INLINE PyObject* __Pyx_decode_bytes(
-         PyObject* string, Py_ssize_t start, Py_ssize_t stop,
-         const char* encoding, const char* errors,
-         PyObject* (*decode_func)(const char *s, Py_ssize_t size, const char *errors)) {
-    char* as_c_string;
-    Py_ssize_t size;
-#if CYTHON_ASSUME_SAFE_MACROS
-    as_c_string = PyBytes_AS_STRING(string);
-    size = PyBytes_GET_SIZE(string);
-#else
-    if (PyBytes_AsStringAndSize(string, &as_c_string, &size) < 0) {
-        return NULL;
-    }
-#endif
-    return __Pyx_decode_c_bytes(
-        as_c_string, size,
-        start, stop, encoding, errors, decode_func);
-}
-
-/* GetException.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_GetException(type, value, tb)  __Pyx__GetException(__pyx_tstate, type, value, tb)
-static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
-#else
-static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
-#endif
-
-/* SwapException.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_ExceptionSwap(type, value, tb)  __Pyx__ExceptionSwap(__pyx_tstate, type, value, tb)
-static CYTHON_INLINE void __Pyx__ExceptionSwap(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
-#else
-static CYTHON_INLINE void __Pyx_ExceptionSwap(PyObject **type, PyObject **value, PyObject **tb);
-#endif
-
-/* GetTopmostException.proto */
-#if CYTHON_USE_EXC_INFO_STACK && CYTHON_FAST_THREAD_STATE
-static _PyErr_StackItem * __Pyx_PyErr_GetTopmostException(PyThreadState *tstate);
-#endif
-
-/* SaveResetException.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_ExceptionSave(type, value, tb)  __Pyx__ExceptionSave(__pyx_tstate, type, value, tb)
-static CYTHON_INLINE void __Pyx__ExceptionSave(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
-#define __Pyx_ExceptionReset(type, value, tb)  __Pyx__ExceptionReset(__pyx_tstate, type, value, tb)
-static CYTHON_INLINE void __Pyx__ExceptionReset(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
-#else
-#define __Pyx_ExceptionSave(type, value, tb)   PyErr_GetExcInfo(type, value, tb)
-#define __Pyx_ExceptionReset(type, value, tb)  PyErr_SetExcInfo(type, value, tb)
-#endif
-
-/* PyIntCompare.proto */
-static CYTHON_INLINE int __Pyx_PyInt_BoolEqObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
-
 /* ListAppend.proto */
 #if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
 static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
@@ -1926,6 +1893,30 @@ static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, 
 /* PyObject_Str.proto */
 #define __Pyx_PyObject_Str(obj)\
     (likely(PyString_CheckExact(obj)) ? __Pyx_NewRef(obj) : PyObject_Str(obj))
+
+/* GetTopmostException.proto */
+#if CYTHON_USE_EXC_INFO_STACK && CYTHON_FAST_THREAD_STATE
+static _PyErr_StackItem * __Pyx_PyErr_GetTopmostException(PyThreadState *tstate);
+#endif
+
+/* SaveResetException.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_ExceptionSave(type, value, tb)  __Pyx__ExceptionSave(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx__ExceptionSave(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#define __Pyx_ExceptionReset(type, value, tb)  __Pyx__ExceptionReset(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx__ExceptionReset(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
+#else
+#define __Pyx_ExceptionSave(type, value, tb)   PyErr_GetExcInfo(type, value, tb)
+#define __Pyx_ExceptionReset(type, value, tb)  PyErr_SetExcInfo(type, value, tb)
+#endif
+
+/* GetException.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_GetException(type, value, tb)  __Pyx__GetException(__pyx_tstate, type, value, tb)
+static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#else
+static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
+#endif
 
 /* RaiseUnexpectedTypeError.proto */
 static int __Pyx_RaiseUnexpectedTypeError(const char *expected, PyObject *obj);
@@ -2138,6 +2129,9 @@ static void __Pyx_AddTraceback(const char *funcname, int c_line,
 #endif
 
 /* CIntFromPy.proto */
+static CYTHON_INLINE uint16_t __Pyx_PyInt_As_uint16_t(PyObject *);
+
+/* CIntFromPy.proto */
 static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *);
 
 /* CIntToPy.proto */
@@ -2188,9 +2182,14 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 /* #### Code section: module_declarations ### */
 
+/* Module declarations from "libc.stdint" */
+
+/* Module declarations from "libc.string" */
+
 /* Module declarations from "scanner" */
-static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
-static PyObject *__pyx_f_7scanner_scan_ip_list(PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
+static int __pyx_f_7scanner_c_scan_port(char const *, uint16_t, double, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_7scanner_scan_ip_range *__pyx_optional_args); /*proto*/
+static PyObject *__pyx_f_7scanner_scan_ip_list(PyObject *, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_7scanner_scan_ip_list *__pyx_optional_args); /*proto*/
 /* #### Code section: typeinfo ### */
 /* #### Code section: before_global_var ### */
 #define __Pyx_MODULE_NAME "scanner"
@@ -2203,25 +2202,21 @@ static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 /* #### Code section: string_decls ### */
 static const char __pyx_k_[] = "-";
-static const char __pyx_k_s[] = "s";
 static const char __pyx_k__3[] = "*";
-static const char __pyx_k__14[] = "?";
+static const char __pyx_k__18[] = "?";
 static const char __pyx_k_host[] = "host";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_port[] = "port";
 static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_test[] = "__test__";
-static const char __pyx_k_close[] = "close";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_split[] = "split";
 static const char __pyx_k_strip[] = "strip";
 static const char __pyx_k_end_ip[] = "end_ip";
 static const char __pyx_k_import[] = "__import__";
-static const char __pyx_k_result[] = "result";
-static const char __pyx_k_socket[] = "socket";
 static const char __pyx_k_update[] = "update";
-static const char __pyx_k_AF_INET[] = "AF_INET";
+static const char __pyx_k_host_ip[] = "host_ip";
 static const char __pyx_k_scanner[] = "scanner";
 static const char __pyx_k_version[] = "version";
 static const char __pyx_k_port_num[] = "port_num";
@@ -2230,17 +2225,15 @@ static const char __pyx_k_ipaddress[] = "ipaddress";
 static const char __pyx_k_scan_port[] = "scan_port";
 static const char __pyx_k_single_ip[] = "single_ip";
 static const char __pyx_k_ValueError[] = "ValueError";
-static const char __pyx_k_addr_tuple[] = "addr_tuple";
-static const char __pyx_k_connect_ex[] = "connect_ex";
 static const char __pyx_k_end_ip_int[] = "end_ip_int";
 static const char __pyx_k_end_ip_str[] = "end_ip_str";
+static const char __pyx_k_host_c_str[] = "host_c_str";
 static const char __pyx_k_ip_address[] = "ip_address";
 static const char __pyx_k_ip_int_val[] = "ip_int_val";
 static const char __pyx_k_ip_list_py[] = "ip_list_py";
 static const char __pyx_k_open_ports[] = "open_ports";
 static const char __pyx_k_result_ips[] = "result_ips";
-static const char __pyx_k_settimeout[] = "settimeout";
-static const char __pyx_k_SOCK_STREAM[] = "SOCK_STREAM";
+static const char __pyx_k_c_scan_port[] = "c_scan_port";
 static const char __pyx_k_scanner_pyx[] = "scanner.pyx";
 static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
@@ -2250,17 +2243,19 @@ static const char __pyx_k_ports_to_scan[] = "ports_to_scan";
 static const char __pyx_k_scan_ip_range[] = "scan_ip_range";
 static const char __pyx_k_current_ip_int[] = "current_ip_int";
 static const char __pyx_k_ip_range_str_py[] = "ip_range_str_py";
+static const char __pyx_k_timeout_seconds[] = "timeout_seconds";
 static const char __pyx_k_ports_to_scan_py[] = "ports_to_scan_py";
 static const char __pyx_k_parse_ip_range_py[] = "_parse_ip_range_py";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_scan_ports_single_ip[] = "scan_ports_single_ip";
 /* #### Code section: decls ### */
-static PyObject *__pyx_pf_7scanner_scan_port(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_host, int __pyx_v_port); /* proto */
-static PyObject *__pyx_pf_7scanner_2scan_ports_single_ip(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_host, PyObject *__pyx_v_ports_to_scan); /* proto */
-static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_range_str_py); /* proto */
-static PyObject *__pyx_pf_7scanner_6scan_ip_range(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_range_str_py, PyObject *__pyx_v_ports_to_scan_py); /* proto */
-static PyObject *__pyx_pf_7scanner_8scan_ip_list(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_list_py, PyObject *__pyx_v_ports_to_scan_py); /* proto */
+static PyObject *__pyx_pf_7scanner_c_scan_port(CYTHON_UNUSED PyObject *__pyx_self, char const *__pyx_v_host_ip, uint16_t __pyx_v_port_num, double __pyx_v_timeout_seconds); /* proto */
+static PyObject *__pyx_pf_7scanner_2scan_port(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_host, int __pyx_v_port, double __pyx_v_timeout_seconds); /* proto */
+static PyObject *__pyx_pf_7scanner_4scan_ports_single_ip(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_host, PyObject *__pyx_v_ports_to_scan, double __pyx_v_timeout_seconds); /* proto */
+static PyObject *__pyx_pf_7scanner_6_parse_ip_range_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_range_str_py); /* proto */
+static PyObject *__pyx_pf_7scanner_8scan_ip_range(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_range_str_py, PyObject *__pyx_v_ports_to_scan_py, double __pyx_v_timeout_seconds); /* proto */
+static PyObject *__pyx_pf_7scanner_10scan_ip_list(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_list_py, PyObject *__pyx_v_ports_to_scan_py, double __pyx_v_timeout_seconds); /* proto */
 static __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_update = {0, 0, 0, 0, 0};
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
@@ -2291,22 +2286,24 @@ typedef struct {
   #endif
   #if CYTHON_USE_MODULE_STATE
   #endif
+  #if CYTHON_USE_MODULE_STATE
+  #endif
+  #if CYTHON_USE_MODULE_STATE
+  #endif
   PyObject *__pyx_kp_u_;
-  PyObject *__pyx_n_s_AF_INET;
-  PyObject *__pyx_n_s_SOCK_STREAM;
   PyObject *__pyx_n_s_ValueError;
-  PyObject *__pyx_n_s__14;
+  PyObject *__pyx_n_s__18;
   PyObject *__pyx_n_s__3;
-  PyObject *__pyx_n_s_addr_tuple;
   PyObject *__pyx_n_s_asyncio_coroutines;
+  PyObject *__pyx_n_s_c_scan_port;
   PyObject *__pyx_n_s_cline_in_traceback;
-  PyObject *__pyx_n_s_close;
-  PyObject *__pyx_n_s_connect_ex;
   PyObject *__pyx_n_s_current_ip_int;
   PyObject *__pyx_n_s_end_ip;
   PyObject *__pyx_n_s_end_ip_int;
   PyObject *__pyx_n_s_end_ip_str;
   PyObject *__pyx_n_s_host;
+  PyObject *__pyx_n_s_host_c_str;
+  PyObject *__pyx_n_s_host_ip;
   PyObject *__pyx_n_s_import;
   PyObject *__pyx_n_s_initializing;
   PyObject *__pyx_n_s_ip_address;
@@ -2324,42 +2321,41 @@ typedef struct {
   PyObject *__pyx_n_s_ports_to_scan;
   PyObject *__pyx_n_s_ports_to_scan_py;
   PyObject *__pyx_n_s_range;
-  PyObject *__pyx_n_s_result;
   PyObject *__pyx_n_s_result_ips;
-  PyObject *__pyx_n_s_s;
   PyObject *__pyx_n_s_scan_ip_list;
   PyObject *__pyx_n_s_scan_ip_range;
   PyObject *__pyx_n_s_scan_port;
   PyObject *__pyx_n_s_scan_ports_single_ip;
   PyObject *__pyx_n_s_scanner;
   PyObject *__pyx_kp_s_scanner_pyx;
-  PyObject *__pyx_n_s_settimeout;
   PyObject *__pyx_n_s_single_ip;
-  PyObject *__pyx_n_s_socket;
   PyObject *__pyx_n_s_spec;
   PyObject *__pyx_n_s_split;
   PyObject *__pyx_n_s_start_ip;
   PyObject *__pyx_n_s_start_ip_str;
   PyObject *__pyx_n_s_strip;
   PyObject *__pyx_n_s_test;
+  PyObject *__pyx_n_s_timeout_seconds;
   PyObject *__pyx_n_s_update;
   PyObject *__pyx_n_s_version;
   PyObject *__pyx_float_1_0;
-  PyObject *__pyx_int_0;
   PyObject *__pyx_int_1;
   PyObject *__pyx_int_4096;
-  PyObject *__pyx_int_neg_1;
   PyObject *__pyx_tuple__2;
   PyObject *__pyx_tuple__4;
   PyObject *__pyx_tuple__6;
   PyObject *__pyx_tuple__8;
   PyObject *__pyx_tuple__10;
   PyObject *__pyx_tuple__12;
+  PyObject *__pyx_tuple__14;
+  PyObject *__pyx_tuple__15;
+  PyObject *__pyx_tuple__17;
   PyObject *__pyx_codeobj__5;
   PyObject *__pyx_codeobj__7;
   PyObject *__pyx_codeobj__9;
   PyObject *__pyx_codeobj__11;
   PyObject *__pyx_codeobj__13;
+  PyObject *__pyx_codeobj__16;
 } __pyx_mstate;
 
 #if CYTHON_USE_MODULE_STATE
@@ -2403,21 +2399,19 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_FusedFunctionType);
   #endif
   Py_CLEAR(clear_module_state->__pyx_kp_u_);
-  Py_CLEAR(clear_module_state->__pyx_n_s_AF_INET);
-  Py_CLEAR(clear_module_state->__pyx_n_s_SOCK_STREAM);
   Py_CLEAR(clear_module_state->__pyx_n_s_ValueError);
-  Py_CLEAR(clear_module_state->__pyx_n_s__14);
+  Py_CLEAR(clear_module_state->__pyx_n_s__18);
   Py_CLEAR(clear_module_state->__pyx_n_s__3);
-  Py_CLEAR(clear_module_state->__pyx_n_s_addr_tuple);
   Py_CLEAR(clear_module_state->__pyx_n_s_asyncio_coroutines);
+  Py_CLEAR(clear_module_state->__pyx_n_s_c_scan_port);
   Py_CLEAR(clear_module_state->__pyx_n_s_cline_in_traceback);
-  Py_CLEAR(clear_module_state->__pyx_n_s_close);
-  Py_CLEAR(clear_module_state->__pyx_n_s_connect_ex);
   Py_CLEAR(clear_module_state->__pyx_n_s_current_ip_int);
   Py_CLEAR(clear_module_state->__pyx_n_s_end_ip);
   Py_CLEAR(clear_module_state->__pyx_n_s_end_ip_int);
   Py_CLEAR(clear_module_state->__pyx_n_s_end_ip_str);
   Py_CLEAR(clear_module_state->__pyx_n_s_host);
+  Py_CLEAR(clear_module_state->__pyx_n_s_host_c_str);
+  Py_CLEAR(clear_module_state->__pyx_n_s_host_ip);
   Py_CLEAR(clear_module_state->__pyx_n_s_import);
   Py_CLEAR(clear_module_state->__pyx_n_s_initializing);
   Py_CLEAR(clear_module_state->__pyx_n_s_ip_address);
@@ -2435,42 +2429,41 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_ports_to_scan);
   Py_CLEAR(clear_module_state->__pyx_n_s_ports_to_scan_py);
   Py_CLEAR(clear_module_state->__pyx_n_s_range);
-  Py_CLEAR(clear_module_state->__pyx_n_s_result);
   Py_CLEAR(clear_module_state->__pyx_n_s_result_ips);
-  Py_CLEAR(clear_module_state->__pyx_n_s_s);
   Py_CLEAR(clear_module_state->__pyx_n_s_scan_ip_list);
   Py_CLEAR(clear_module_state->__pyx_n_s_scan_ip_range);
   Py_CLEAR(clear_module_state->__pyx_n_s_scan_port);
   Py_CLEAR(clear_module_state->__pyx_n_s_scan_ports_single_ip);
   Py_CLEAR(clear_module_state->__pyx_n_s_scanner);
   Py_CLEAR(clear_module_state->__pyx_kp_s_scanner_pyx);
-  Py_CLEAR(clear_module_state->__pyx_n_s_settimeout);
   Py_CLEAR(clear_module_state->__pyx_n_s_single_ip);
-  Py_CLEAR(clear_module_state->__pyx_n_s_socket);
   Py_CLEAR(clear_module_state->__pyx_n_s_spec);
   Py_CLEAR(clear_module_state->__pyx_n_s_split);
   Py_CLEAR(clear_module_state->__pyx_n_s_start_ip);
   Py_CLEAR(clear_module_state->__pyx_n_s_start_ip_str);
   Py_CLEAR(clear_module_state->__pyx_n_s_strip);
   Py_CLEAR(clear_module_state->__pyx_n_s_test);
+  Py_CLEAR(clear_module_state->__pyx_n_s_timeout_seconds);
   Py_CLEAR(clear_module_state->__pyx_n_s_update);
   Py_CLEAR(clear_module_state->__pyx_n_s_version);
   Py_CLEAR(clear_module_state->__pyx_float_1_0);
-  Py_CLEAR(clear_module_state->__pyx_int_0);
   Py_CLEAR(clear_module_state->__pyx_int_1);
   Py_CLEAR(clear_module_state->__pyx_int_4096);
-  Py_CLEAR(clear_module_state->__pyx_int_neg_1);
   Py_CLEAR(clear_module_state->__pyx_tuple__2);
   Py_CLEAR(clear_module_state->__pyx_tuple__4);
   Py_CLEAR(clear_module_state->__pyx_tuple__6);
   Py_CLEAR(clear_module_state->__pyx_tuple__8);
   Py_CLEAR(clear_module_state->__pyx_tuple__10);
   Py_CLEAR(clear_module_state->__pyx_tuple__12);
+  Py_CLEAR(clear_module_state->__pyx_tuple__14);
+  Py_CLEAR(clear_module_state->__pyx_tuple__15);
+  Py_CLEAR(clear_module_state->__pyx_tuple__17);
   Py_CLEAR(clear_module_state->__pyx_codeobj__5);
   Py_CLEAR(clear_module_state->__pyx_codeobj__7);
   Py_CLEAR(clear_module_state->__pyx_codeobj__9);
   Py_CLEAR(clear_module_state->__pyx_codeobj__11);
   Py_CLEAR(clear_module_state->__pyx_codeobj__13);
+  Py_CLEAR(clear_module_state->__pyx_codeobj__16);
   return 0;
 }
 #endif
@@ -2492,21 +2485,19 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_FusedFunctionType);
   #endif
   Py_VISIT(traverse_module_state->__pyx_kp_u_);
-  Py_VISIT(traverse_module_state->__pyx_n_s_AF_INET);
-  Py_VISIT(traverse_module_state->__pyx_n_s_SOCK_STREAM);
   Py_VISIT(traverse_module_state->__pyx_n_s_ValueError);
-  Py_VISIT(traverse_module_state->__pyx_n_s__14);
+  Py_VISIT(traverse_module_state->__pyx_n_s__18);
   Py_VISIT(traverse_module_state->__pyx_n_s__3);
-  Py_VISIT(traverse_module_state->__pyx_n_s_addr_tuple);
   Py_VISIT(traverse_module_state->__pyx_n_s_asyncio_coroutines);
+  Py_VISIT(traverse_module_state->__pyx_n_s_c_scan_port);
   Py_VISIT(traverse_module_state->__pyx_n_s_cline_in_traceback);
-  Py_VISIT(traverse_module_state->__pyx_n_s_close);
-  Py_VISIT(traverse_module_state->__pyx_n_s_connect_ex);
   Py_VISIT(traverse_module_state->__pyx_n_s_current_ip_int);
   Py_VISIT(traverse_module_state->__pyx_n_s_end_ip);
   Py_VISIT(traverse_module_state->__pyx_n_s_end_ip_int);
   Py_VISIT(traverse_module_state->__pyx_n_s_end_ip_str);
   Py_VISIT(traverse_module_state->__pyx_n_s_host);
+  Py_VISIT(traverse_module_state->__pyx_n_s_host_c_str);
+  Py_VISIT(traverse_module_state->__pyx_n_s_host_ip);
   Py_VISIT(traverse_module_state->__pyx_n_s_import);
   Py_VISIT(traverse_module_state->__pyx_n_s_initializing);
   Py_VISIT(traverse_module_state->__pyx_n_s_ip_address);
@@ -2524,42 +2515,41 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_ports_to_scan);
   Py_VISIT(traverse_module_state->__pyx_n_s_ports_to_scan_py);
   Py_VISIT(traverse_module_state->__pyx_n_s_range);
-  Py_VISIT(traverse_module_state->__pyx_n_s_result);
   Py_VISIT(traverse_module_state->__pyx_n_s_result_ips);
-  Py_VISIT(traverse_module_state->__pyx_n_s_s);
   Py_VISIT(traverse_module_state->__pyx_n_s_scan_ip_list);
   Py_VISIT(traverse_module_state->__pyx_n_s_scan_ip_range);
   Py_VISIT(traverse_module_state->__pyx_n_s_scan_port);
   Py_VISIT(traverse_module_state->__pyx_n_s_scan_ports_single_ip);
   Py_VISIT(traverse_module_state->__pyx_n_s_scanner);
   Py_VISIT(traverse_module_state->__pyx_kp_s_scanner_pyx);
-  Py_VISIT(traverse_module_state->__pyx_n_s_settimeout);
   Py_VISIT(traverse_module_state->__pyx_n_s_single_ip);
-  Py_VISIT(traverse_module_state->__pyx_n_s_socket);
   Py_VISIT(traverse_module_state->__pyx_n_s_spec);
   Py_VISIT(traverse_module_state->__pyx_n_s_split);
   Py_VISIT(traverse_module_state->__pyx_n_s_start_ip);
   Py_VISIT(traverse_module_state->__pyx_n_s_start_ip_str);
   Py_VISIT(traverse_module_state->__pyx_n_s_strip);
   Py_VISIT(traverse_module_state->__pyx_n_s_test);
+  Py_VISIT(traverse_module_state->__pyx_n_s_timeout_seconds);
   Py_VISIT(traverse_module_state->__pyx_n_s_update);
   Py_VISIT(traverse_module_state->__pyx_n_s_version);
   Py_VISIT(traverse_module_state->__pyx_float_1_0);
-  Py_VISIT(traverse_module_state->__pyx_int_0);
   Py_VISIT(traverse_module_state->__pyx_int_1);
   Py_VISIT(traverse_module_state->__pyx_int_4096);
-  Py_VISIT(traverse_module_state->__pyx_int_neg_1);
   Py_VISIT(traverse_module_state->__pyx_tuple__2);
   Py_VISIT(traverse_module_state->__pyx_tuple__4);
   Py_VISIT(traverse_module_state->__pyx_tuple__6);
   Py_VISIT(traverse_module_state->__pyx_tuple__8);
   Py_VISIT(traverse_module_state->__pyx_tuple__10);
   Py_VISIT(traverse_module_state->__pyx_tuple__12);
+  Py_VISIT(traverse_module_state->__pyx_tuple__14);
+  Py_VISIT(traverse_module_state->__pyx_tuple__15);
+  Py_VISIT(traverse_module_state->__pyx_tuple__17);
   Py_VISIT(traverse_module_state->__pyx_codeobj__5);
   Py_VISIT(traverse_module_state->__pyx_codeobj__7);
   Py_VISIT(traverse_module_state->__pyx_codeobj__9);
   Py_VISIT(traverse_module_state->__pyx_codeobj__11);
   Py_VISIT(traverse_module_state->__pyx_codeobj__13);
+  Py_VISIT(traverse_module_state->__pyx_codeobj__16);
   return 0;
 }
 #endif
@@ -2590,22 +2580,24 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #endif
 #if CYTHON_USE_MODULE_STATE
 #endif
+#if CYTHON_USE_MODULE_STATE
+#endif
+#if CYTHON_USE_MODULE_STATE
+#endif
 #define __pyx_kp_u_ __pyx_mstate_global->__pyx_kp_u_
-#define __pyx_n_s_AF_INET __pyx_mstate_global->__pyx_n_s_AF_INET
-#define __pyx_n_s_SOCK_STREAM __pyx_mstate_global->__pyx_n_s_SOCK_STREAM
 #define __pyx_n_s_ValueError __pyx_mstate_global->__pyx_n_s_ValueError
-#define __pyx_n_s__14 __pyx_mstate_global->__pyx_n_s__14
+#define __pyx_n_s__18 __pyx_mstate_global->__pyx_n_s__18
 #define __pyx_n_s__3 __pyx_mstate_global->__pyx_n_s__3
-#define __pyx_n_s_addr_tuple __pyx_mstate_global->__pyx_n_s_addr_tuple
 #define __pyx_n_s_asyncio_coroutines __pyx_mstate_global->__pyx_n_s_asyncio_coroutines
+#define __pyx_n_s_c_scan_port __pyx_mstate_global->__pyx_n_s_c_scan_port
 #define __pyx_n_s_cline_in_traceback __pyx_mstate_global->__pyx_n_s_cline_in_traceback
-#define __pyx_n_s_close __pyx_mstate_global->__pyx_n_s_close
-#define __pyx_n_s_connect_ex __pyx_mstate_global->__pyx_n_s_connect_ex
 #define __pyx_n_s_current_ip_int __pyx_mstate_global->__pyx_n_s_current_ip_int
 #define __pyx_n_s_end_ip __pyx_mstate_global->__pyx_n_s_end_ip
 #define __pyx_n_s_end_ip_int __pyx_mstate_global->__pyx_n_s_end_ip_int
 #define __pyx_n_s_end_ip_str __pyx_mstate_global->__pyx_n_s_end_ip_str
 #define __pyx_n_s_host __pyx_mstate_global->__pyx_n_s_host
+#define __pyx_n_s_host_c_str __pyx_mstate_global->__pyx_n_s_host_c_str
+#define __pyx_n_s_host_ip __pyx_mstate_global->__pyx_n_s_host_ip
 #define __pyx_n_s_import __pyx_mstate_global->__pyx_n_s_import
 #define __pyx_n_s_initializing __pyx_mstate_global->__pyx_n_s_initializing
 #define __pyx_n_s_ip_address __pyx_mstate_global->__pyx_n_s_ip_address
@@ -2623,63 +2615,890 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_ports_to_scan __pyx_mstate_global->__pyx_n_s_ports_to_scan
 #define __pyx_n_s_ports_to_scan_py __pyx_mstate_global->__pyx_n_s_ports_to_scan_py
 #define __pyx_n_s_range __pyx_mstate_global->__pyx_n_s_range
-#define __pyx_n_s_result __pyx_mstate_global->__pyx_n_s_result
 #define __pyx_n_s_result_ips __pyx_mstate_global->__pyx_n_s_result_ips
-#define __pyx_n_s_s __pyx_mstate_global->__pyx_n_s_s
 #define __pyx_n_s_scan_ip_list __pyx_mstate_global->__pyx_n_s_scan_ip_list
 #define __pyx_n_s_scan_ip_range __pyx_mstate_global->__pyx_n_s_scan_ip_range
 #define __pyx_n_s_scan_port __pyx_mstate_global->__pyx_n_s_scan_port
 #define __pyx_n_s_scan_ports_single_ip __pyx_mstate_global->__pyx_n_s_scan_ports_single_ip
 #define __pyx_n_s_scanner __pyx_mstate_global->__pyx_n_s_scanner
 #define __pyx_kp_s_scanner_pyx __pyx_mstate_global->__pyx_kp_s_scanner_pyx
-#define __pyx_n_s_settimeout __pyx_mstate_global->__pyx_n_s_settimeout
 #define __pyx_n_s_single_ip __pyx_mstate_global->__pyx_n_s_single_ip
-#define __pyx_n_s_socket __pyx_mstate_global->__pyx_n_s_socket
 #define __pyx_n_s_spec __pyx_mstate_global->__pyx_n_s_spec
 #define __pyx_n_s_split __pyx_mstate_global->__pyx_n_s_split
 #define __pyx_n_s_start_ip __pyx_mstate_global->__pyx_n_s_start_ip
 #define __pyx_n_s_start_ip_str __pyx_mstate_global->__pyx_n_s_start_ip_str
 #define __pyx_n_s_strip __pyx_mstate_global->__pyx_n_s_strip
 #define __pyx_n_s_test __pyx_mstate_global->__pyx_n_s_test
+#define __pyx_n_s_timeout_seconds __pyx_mstate_global->__pyx_n_s_timeout_seconds
 #define __pyx_n_s_update __pyx_mstate_global->__pyx_n_s_update
 #define __pyx_n_s_version __pyx_mstate_global->__pyx_n_s_version
 #define __pyx_float_1_0 __pyx_mstate_global->__pyx_float_1_0
-#define __pyx_int_0 __pyx_mstate_global->__pyx_int_0
 #define __pyx_int_1 __pyx_mstate_global->__pyx_int_1
 #define __pyx_int_4096 __pyx_mstate_global->__pyx_int_4096
-#define __pyx_int_neg_1 __pyx_mstate_global->__pyx_int_neg_1
 #define __pyx_tuple__2 __pyx_mstate_global->__pyx_tuple__2
 #define __pyx_tuple__4 __pyx_mstate_global->__pyx_tuple__4
 #define __pyx_tuple__6 __pyx_mstate_global->__pyx_tuple__6
 #define __pyx_tuple__8 __pyx_mstate_global->__pyx_tuple__8
 #define __pyx_tuple__10 __pyx_mstate_global->__pyx_tuple__10
 #define __pyx_tuple__12 __pyx_mstate_global->__pyx_tuple__12
+#define __pyx_tuple__14 __pyx_mstate_global->__pyx_tuple__14
+#define __pyx_tuple__15 __pyx_mstate_global->__pyx_tuple__15
+#define __pyx_tuple__17 __pyx_mstate_global->__pyx_tuple__17
 #define __pyx_codeobj__5 __pyx_mstate_global->__pyx_codeobj__5
 #define __pyx_codeobj__7 __pyx_mstate_global->__pyx_codeobj__7
 #define __pyx_codeobj__9 __pyx_mstate_global->__pyx_codeobj__9
 #define __pyx_codeobj__11 __pyx_mstate_global->__pyx_codeobj__11
 #define __pyx_codeobj__13 __pyx_mstate_global->__pyx_codeobj__13
+#define __pyx_codeobj__16 __pyx_mstate_global->__pyx_codeobj__16
 /* #### Code section: module_code ### */
 
-/* "scanner.pyx":8
+/* "scanner.pyx":66
+ *     int C_EINPROGRESS "EINPROGRESS"
  *
- * # Ensure scan_port and scan_ports_single_ip are present
- * def scan_port(bytes host, int port):             # <<<<<<<<<<<<<<
- *     """
- *     (Cython) Scans a single port on a single host.
+ * cpdef bint c_scan_port(const char* host_ip, uint16_t port_num, double timeout_seconds) except -1:             # <<<<<<<<<<<<<<
+ *     cdef int sock_fd = -1
+ *     cdef c_sockaddr_in serv_addr
  */
 
-/* Python wrapper */
-static PyObject *__pyx_pw_7scanner_1scan_port(PyObject *__pyx_self,
+static PyObject *__pyx_pw_7scanner_1c_scan_port(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_7scanner_scan_port, "\n    (Cython) Scans a single port on a single host.\n\n    Args:\n        host: The target host IP address (as bytes, e.g., b\"192.168.1.1\").\n        port: The target port number.\n\n    Returns:\n        True if the port is open, False otherwise.\n    ");
-static PyMethodDef __pyx_mdef_7scanner_1scan_port = {"scan_port", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_1scan_port, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_scan_port};
-static PyObject *__pyx_pw_7scanner_1scan_port(PyObject *__pyx_self,
+static int __pyx_f_7scanner_c_scan_port(char const *__pyx_v_host_ip, uint16_t __pyx_v_port_num, double __pyx_v_timeout_seconds, CYTHON_UNUSED int __pyx_skip_dispatch) {
+  int __pyx_v_sock_fd;
+  struct sockaddr_in __pyx_v_serv_addr;
+  int __pyx_v_ret;
+  long __pyx_v_arg;
+  struct timeval __pyx_v_tv;
+  fd_set __pyx_v_writefds;
+  int __pyx_v_so_error;
+  socklen_t __pyx_v_optlen;
+  int __pyx_v_is_open;
+  int __pyx_r;
+  int __pyx_t_1;
+  int __pyx_t_2;
+
+  /* "scanner.pyx":67
+ *
+ * cpdef bint c_scan_port(const char* host_ip, uint16_t port_num, double timeout_seconds) except -1:
+ *     cdef int sock_fd = -1             # <<<<<<<<<<<<<<
+ *     cdef c_sockaddr_in serv_addr
+ *     cdef int ret
+ */
+  __pyx_v_sock_fd = -1;
+
+  /* "scanner.pyx":73
+ *     cdef c_timeval tv
+ *     cdef c_fd_set writefds
+ *     cdef int so_error = 0             # <<<<<<<<<<<<<<
+ *     cdef socklen_t optlen = sizeof(so_error)
+ *     cdef bint is_open = False
+ */
+  __pyx_v_so_error = 0;
+
+  /* "scanner.pyx":74
+ *     cdef c_fd_set writefds
+ *     cdef int so_error = 0
+ *     cdef socklen_t optlen = sizeof(so_error)             # <<<<<<<<<<<<<<
+ *     cdef bint is_open = False
+ *
+ */
+  __pyx_v_optlen = (sizeof(__pyx_v_so_error));
+
+  /* "scanner.pyx":75
+ *     cdef int so_error = 0
+ *     cdef socklen_t optlen = sizeof(so_error)
+ *     cdef bint is_open = False             # <<<<<<<<<<<<<<
+ *
+ *     sock_fd = c_socket(C_AF_INET, C_SOCK_STREAM, 0)
+ */
+  __pyx_v_is_open = 0;
+
+  /* "scanner.pyx":77
+ *     cdef bint is_open = False
+ *
+ *     sock_fd = c_socket(C_AF_INET, C_SOCK_STREAM, 0)             # <<<<<<<<<<<<<<
+ *     if sock_fd < 0: return False
+ *     arg = fcntl(sock_fd, C_F_GETFL, 0)
+ */
+  __pyx_v_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+  /* "scanner.pyx":78
+ *
+ *     sock_fd = c_socket(C_AF_INET, C_SOCK_STREAM, 0)
+ *     if sock_fd < 0: return False             # <<<<<<<<<<<<<<
+ *     arg = fcntl(sock_fd, C_F_GETFL, 0)
+ *     if arg < 0:
+ */
+  __pyx_t_1 = (__pyx_v_sock_fd < 0);
+  if (__pyx_t_1) {
+    __pyx_r = 0;
+    goto __pyx_L0;
+  }
+
+  /* "scanner.pyx":79
+ *     sock_fd = c_socket(C_AF_INET, C_SOCK_STREAM, 0)
+ *     if sock_fd < 0: return False
+ *     arg = fcntl(sock_fd, C_F_GETFL, 0)             # <<<<<<<<<<<<<<
+ *     if arg < 0:
+ *         c_close(sock_fd)
+ */
+  __pyx_v_arg = fcntl(__pyx_v_sock_fd, F_GETFL, 0);
+
+  /* "scanner.pyx":80
+ *     if sock_fd < 0: return False
+ *     arg = fcntl(sock_fd, C_F_GETFL, 0)
+ *     if arg < 0:             # <<<<<<<<<<<<<<
+ *         c_close(sock_fd)
+ *         return False
+ */
+  __pyx_t_1 = (__pyx_v_arg < 0);
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":81
+ *     arg = fcntl(sock_fd, C_F_GETFL, 0)
+ *     if arg < 0:
+ *         c_close(sock_fd)             # <<<<<<<<<<<<<<
+ *         return False
+ *     ret = fcntl(sock_fd, C_F_SETFL, arg | C_O_NONBLOCK)
+ */
+    (void)(close(__pyx_v_sock_fd));
+
+    /* "scanner.pyx":82
+ *     if arg < 0:
+ *         c_close(sock_fd)
+ *         return False             # <<<<<<<<<<<<<<
+ *     ret = fcntl(sock_fd, C_F_SETFL, arg | C_O_NONBLOCK)
+ *     if ret < 0:
+ */
+    __pyx_r = 0;
+    goto __pyx_L0;
+
+    /* "scanner.pyx":80
+ *     if sock_fd < 0: return False
+ *     arg = fcntl(sock_fd, C_F_GETFL, 0)
+ *     if arg < 0:             # <<<<<<<<<<<<<<
+ *         c_close(sock_fd)
+ *         return False
+ */
+  }
+
+  /* "scanner.pyx":83
+ *         c_close(sock_fd)
+ *         return False
+ *     ret = fcntl(sock_fd, C_F_SETFL, arg | C_O_NONBLOCK)             # <<<<<<<<<<<<<<
+ *     if ret < 0:
+ *         c_close(sock_fd)
+ */
+  __pyx_v_ret = fcntl(__pyx_v_sock_fd, F_SETFL, (__pyx_v_arg | O_NONBLOCK));
+
+  /* "scanner.pyx":84
+ *         return False
+ *     ret = fcntl(sock_fd, C_F_SETFL, arg | C_O_NONBLOCK)
+ *     if ret < 0:             # <<<<<<<<<<<<<<
+ *         c_close(sock_fd)
+ *         return False
+ */
+  __pyx_t_1 = (__pyx_v_ret < 0);
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":85
+ *     ret = fcntl(sock_fd, C_F_SETFL, arg | C_O_NONBLOCK)
+ *     if ret < 0:
+ *         c_close(sock_fd)             # <<<<<<<<<<<<<<
+ *         return False
+ *     memset(&serv_addr, 0, sizeof(c_sockaddr_in))
+ */
+    (void)(close(__pyx_v_sock_fd));
+
+    /* "scanner.pyx":86
+ *     if ret < 0:
+ *         c_close(sock_fd)
+ *         return False             # <<<<<<<<<<<<<<
+ *     memset(&serv_addr, 0, sizeof(c_sockaddr_in))
+ *     serv_addr.sin_family = C_AF_INET
+ */
+    __pyx_r = 0;
+    goto __pyx_L0;
+
+    /* "scanner.pyx":84
+ *         return False
+ *     ret = fcntl(sock_fd, C_F_SETFL, arg | C_O_NONBLOCK)
+ *     if ret < 0:             # <<<<<<<<<<<<<<
+ *         c_close(sock_fd)
+ *         return False
+ */
+  }
+
+  /* "scanner.pyx":87
+ *         c_close(sock_fd)
+ *         return False
+ *     memset(&serv_addr, 0, sizeof(c_sockaddr_in))             # <<<<<<<<<<<<<<
+ *     serv_addr.sin_family = C_AF_INET
+ *     serv_addr.sin_port = htons(port_num)
+ */
+  (void)(memset((&__pyx_v_serv_addr), 0, (sizeof(struct sockaddr_in))));
+
+  /* "scanner.pyx":88
+ *         return False
+ *     memset(&serv_addr, 0, sizeof(c_sockaddr_in))
+ *     serv_addr.sin_family = C_AF_INET             # <<<<<<<<<<<<<<
+ *     serv_addr.sin_port = htons(port_num)
+ *     if inet_pton(C_AF_INET, host_ip, &serv_addr.sin_addr) <= 0:
+ */
+  __pyx_v_serv_addr.sin_family = AF_INET;
+
+  /* "scanner.pyx":89
+ *     memset(&serv_addr, 0, sizeof(c_sockaddr_in))
+ *     serv_addr.sin_family = C_AF_INET
+ *     serv_addr.sin_port = htons(port_num)             # <<<<<<<<<<<<<<
+ *     if inet_pton(C_AF_INET, host_ip, &serv_addr.sin_addr) <= 0:
+ *         c_close(sock_fd)
+ */
+  __pyx_v_serv_addr.sin_port = htons(__pyx_v_port_num);
+
+  /* "scanner.pyx":90
+ *     serv_addr.sin_family = C_AF_INET
+ *     serv_addr.sin_port = htons(port_num)
+ *     if inet_pton(C_AF_INET, host_ip, &serv_addr.sin_addr) <= 0:             # <<<<<<<<<<<<<<
+ *         c_close(sock_fd)
+ *         return False
+ */
+  __pyx_t_1 = (inet_pton(AF_INET, __pyx_v_host_ip, (&__pyx_v_serv_addr.sin_addr)) <= 0);
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":91
+ *     serv_addr.sin_port = htons(port_num)
+ *     if inet_pton(C_AF_INET, host_ip, &serv_addr.sin_addr) <= 0:
+ *         c_close(sock_fd)             # <<<<<<<<<<<<<<
+ *         return False
+ *     ret = c_connect(sock_fd, <c_sockaddr*>&serv_addr, sizeof(c_sockaddr_in))
+ */
+    (void)(close(__pyx_v_sock_fd));
+
+    /* "scanner.pyx":92
+ *     if inet_pton(C_AF_INET, host_ip, &serv_addr.sin_addr) <= 0:
+ *         c_close(sock_fd)
+ *         return False             # <<<<<<<<<<<<<<
+ *     ret = c_connect(sock_fd, <c_sockaddr*>&serv_addr, sizeof(c_sockaddr_in))
+ *     if ret < 0:
+ */
+    __pyx_r = 0;
+    goto __pyx_L0;
+
+    /* "scanner.pyx":90
+ *     serv_addr.sin_family = C_AF_INET
+ *     serv_addr.sin_port = htons(port_num)
+ *     if inet_pton(C_AF_INET, host_ip, &serv_addr.sin_addr) <= 0:             # <<<<<<<<<<<<<<
+ *         c_close(sock_fd)
+ *         return False
+ */
+  }
+
+  /* "scanner.pyx":93
+ *         c_close(sock_fd)
+ *         return False
+ *     ret = c_connect(sock_fd, <c_sockaddr*>&serv_addr, sizeof(c_sockaddr_in))             # <<<<<<<<<<<<<<
+ *     if ret < 0:
+ *         if errno == C_EINPROGRESS: pass
+ */
+  __pyx_v_ret = connect(__pyx_v_sock_fd, ((struct sockaddr *)(&__pyx_v_serv_addr)), (sizeof(struct sockaddr_in)));
+
+  /* "scanner.pyx":94
+ *         return False
+ *     ret = c_connect(sock_fd, <c_sockaddr*>&serv_addr, sizeof(c_sockaddr_in))
+ *     if ret < 0:             # <<<<<<<<<<<<<<
+ *         if errno == C_EINPROGRESS: pass
+ *         else:
+ */
+  __pyx_t_1 = (__pyx_v_ret < 0);
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":95
+ *     ret = c_connect(sock_fd, <c_sockaddr*>&serv_addr, sizeof(c_sockaddr_in))
+ *     if ret < 0:
+ *         if errno == C_EINPROGRESS: pass             # <<<<<<<<<<<<<<
+ *         else:
+ *             c_close(sock_fd)
+ */
+    __pyx_t_1 = (errno == EINPROGRESS);
+    if (__pyx_t_1) {
+      goto __pyx_L8;
+    }
+
+    /* "scanner.pyx":97
+ *         if errno == C_EINPROGRESS: pass
+ *         else:
+ *             c_close(sock_fd)             # <<<<<<<<<<<<<<
+ *             return False
+ *     elif ret == 0:
+ */
+    /*else*/ {
+      (void)(close(__pyx_v_sock_fd));
+
+      /* "scanner.pyx":98
+ *         else:
+ *             c_close(sock_fd)
+ *             return False             # <<<<<<<<<<<<<<
+ *     elif ret == 0:
+ *         c_close(sock_fd)
+ */
+      __pyx_r = 0;
+      goto __pyx_L0;
+    }
+    __pyx_L8:;
+
+    /* "scanner.pyx":94
+ *         return False
+ *     ret = c_connect(sock_fd, <c_sockaddr*>&serv_addr, sizeof(c_sockaddr_in))
+ *     if ret < 0:             # <<<<<<<<<<<<<<
+ *         if errno == C_EINPROGRESS: pass
+ *         else:
+ */
+    goto __pyx_L7;
+  }
+
+  /* "scanner.pyx":99
+ *             c_close(sock_fd)
+ *             return False
+ *     elif ret == 0:             # <<<<<<<<<<<<<<
+ *         c_close(sock_fd)
+ *         return True
+ */
+  __pyx_t_1 = (__pyx_v_ret == 0);
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":100
+ *             return False
+ *     elif ret == 0:
+ *         c_close(sock_fd)             # <<<<<<<<<<<<<<
+ *         return True
+ *     tv.tv_sec = <long>timeout_seconds
+ */
+    (void)(close(__pyx_v_sock_fd));
+
+    /* "scanner.pyx":101
+ *     elif ret == 0:
+ *         c_close(sock_fd)
+ *         return True             # <<<<<<<<<<<<<<
+ *     tv.tv_sec = <long>timeout_seconds
+ *     tv.tv_usec = <long>((timeout_seconds - tv.tv_sec) * 1000000)
+ */
+    __pyx_r = 1;
+    goto __pyx_L0;
+
+    /* "scanner.pyx":99
+ *             c_close(sock_fd)
+ *             return False
+ *     elif ret == 0:             # <<<<<<<<<<<<<<
+ *         c_close(sock_fd)
+ *         return True
+ */
+  }
+  __pyx_L7:;
+
+  /* "scanner.pyx":102
+ *         c_close(sock_fd)
+ *         return True
+ *     tv.tv_sec = <long>timeout_seconds             # <<<<<<<<<<<<<<
+ *     tv.tv_usec = <long>((timeout_seconds - tv.tv_sec) * 1000000)
+ *
+ */
+  __pyx_v_tv.tv_sec = ((long)__pyx_v_timeout_seconds);
+
+  /* "scanner.pyx":103
+ *         return True
+ *     tv.tv_sec = <long>timeout_seconds
+ *     tv.tv_usec = <long>((timeout_seconds - tv.tv_sec) * 1000000)             # <<<<<<<<<<<<<<
+ *
+ *     if tv.tv_usec < 0:
+ */
+  __pyx_v_tv.tv_usec = ((long)((__pyx_v_timeout_seconds - __pyx_v_tv.tv_sec) * 1000000.0));
+
+  /* "scanner.pyx":105
+ *     tv.tv_usec = <long>((timeout_seconds - tv.tv_sec) * 1000000)
+ *
+ *     if tv.tv_usec < 0:             # <<<<<<<<<<<<<<
+ *         tv.tv_usec = 0
+ *     if tv.tv_usec >= 1000000:
+ */
+  __pyx_t_1 = (__pyx_v_tv.tv_usec < 0);
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":106
+ *
+ *     if tv.tv_usec < 0:
+ *         tv.tv_usec = 0             # <<<<<<<<<<<<<<
+ *     if tv.tv_usec >= 1000000:
+ *         tv.tv_usec = 999999
+ */
+    __pyx_v_tv.tv_usec = 0;
+
+    /* "scanner.pyx":105
+ *     tv.tv_usec = <long>((timeout_seconds - tv.tv_sec) * 1000000)
+ *
+ *     if tv.tv_usec < 0:             # <<<<<<<<<<<<<<
+ *         tv.tv_usec = 0
+ *     if tv.tv_usec >= 1000000:
+ */
+  }
+
+  /* "scanner.pyx":107
+ *     if tv.tv_usec < 0:
+ *         tv.tv_usec = 0
+ *     if tv.tv_usec >= 1000000:             # <<<<<<<<<<<<<<
+ *         tv.tv_usec = 999999
+ *
+ */
+  __pyx_t_1 = (__pyx_v_tv.tv_usec >= 0xF4240);
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":108
+ *         tv.tv_usec = 0
+ *     if tv.tv_usec >= 1000000:
+ *         tv.tv_usec = 999999             # <<<<<<<<<<<<<<
+ *
+ *     # If timeout_seconds was > 0 but calculated tv_sec and tv_usec are both 0,
+ */
+    __pyx_v_tv.tv_usec = 0xF423F;
+
+    /* "scanner.pyx":107
+ *     if tv.tv_usec < 0:
+ *         tv.tv_usec = 0
+ *     if tv.tv_usec >= 1000000:             # <<<<<<<<<<<<<<
+ *         tv.tv_usec = 999999
+ *
+ */
+  }
+
+  /* "scanner.pyx":112
+ *     # If timeout_seconds was > 0 but calculated tv_sec and tv_usec are both 0,
+ *     # make tv_usec 1 to avoid polling, ensuring a minimal wait.
+ *     if timeout_seconds > 0 and tv.tv_sec == 0 and tv.tv_usec == 0:             # <<<<<<<<<<<<<<
+ *         tv.tv_usec = 1
+ *
+ */
+  __pyx_t_2 = (__pyx_v_timeout_seconds > 0.0);
+  if (__pyx_t_2) {
+  } else {
+    __pyx_t_1 = __pyx_t_2;
+    goto __pyx_L12_bool_binop_done;
+  }
+  __pyx_t_2 = (__pyx_v_tv.tv_sec == 0);
+  if (__pyx_t_2) {
+  } else {
+    __pyx_t_1 = __pyx_t_2;
+    goto __pyx_L12_bool_binop_done;
+  }
+  __pyx_t_2 = (__pyx_v_tv.tv_usec == 0);
+  __pyx_t_1 = __pyx_t_2;
+  __pyx_L12_bool_binop_done:;
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":113
+ *     # make tv_usec 1 to avoid polling, ensuring a minimal wait.
+ *     if timeout_seconds > 0 and tv.tv_sec == 0 and tv.tv_usec == 0:
+ *         tv.tv_usec = 1             # <<<<<<<<<<<<<<
+ *
+ *     FD_ZERO(&writefds)
+ */
+    __pyx_v_tv.tv_usec = 1;
+
+    /* "scanner.pyx":112
+ *     # If timeout_seconds was > 0 but calculated tv_sec and tv_usec are both 0,
+ *     # make tv_usec 1 to avoid polling, ensuring a minimal wait.
+ *     if timeout_seconds > 0 and tv.tv_sec == 0 and tv.tv_usec == 0:             # <<<<<<<<<<<<<<
+ *         tv.tv_usec = 1
+ *
+ */
+  }
+
+  /* "scanner.pyx":115
+ *         tv.tv_usec = 1
+ *
+ *     FD_ZERO(&writefds)             # <<<<<<<<<<<<<<
+ *     FD_SET(sock_fd, &writefds)
+ *     with nogil:
+ */
+  FD_ZERO((&__pyx_v_writefds));
+
+  /* "scanner.pyx":116
+ *
+ *     FD_ZERO(&writefds)
+ *     FD_SET(sock_fd, &writefds)             # <<<<<<<<<<<<<<
+ *     with nogil:
+ *         ret = c_select(sock_fd + 1, NULL, &writefds, NULL, &tv)
+ */
+  FD_SET(__pyx_v_sock_fd, (&__pyx_v_writefds));
+
+  /* "scanner.pyx":117
+ *     FD_ZERO(&writefds)
+ *     FD_SET(sock_fd, &writefds)
+ *     with nogil:             # <<<<<<<<<<<<<<
+ *         ret = c_select(sock_fd + 1, NULL, &writefds, NULL, &tv)
+ *     if ret > 0:
+ */
+  {
+      #ifdef WITH_THREAD
+      PyThreadState *_save;
+      _save = NULL;
+      Py_UNBLOCK_THREADS
+      __Pyx_FastGIL_Remember();
+      #endif
+      /*try:*/ {
+
+        /* "scanner.pyx":118
+ *     FD_SET(sock_fd, &writefds)
+ *     with nogil:
+ *         ret = c_select(sock_fd + 1, NULL, &writefds, NULL, &tv)             # <<<<<<<<<<<<<<
+ *     if ret > 0:
+ *         if c_getsockopt(sock_fd, C_SOL_SOCKET, C_SO_ERROR, &so_error, &optlen) < 0:
+ */
+        __pyx_v_ret = select((__pyx_v_sock_fd + 1), NULL, (&__pyx_v_writefds), NULL, (&__pyx_v_tv));
+      }
+
+      /* "scanner.pyx":117
+ *     FD_ZERO(&writefds)
+ *     FD_SET(sock_fd, &writefds)
+ *     with nogil:             # <<<<<<<<<<<<<<
+ *         ret = c_select(sock_fd + 1, NULL, &writefds, NULL, &tv)
+ *     if ret > 0:
+ */
+      /*finally:*/ {
+        /*normal exit:*/{
+          #ifdef WITH_THREAD
+          __Pyx_FastGIL_Forget();
+          Py_BLOCK_THREADS
+          #endif
+          goto __pyx_L17;
+        }
+        __pyx_L17:;
+      }
+  }
+
+  /* "scanner.pyx":119
+ *     with nogil:
+ *         ret = c_select(sock_fd + 1, NULL, &writefds, NULL, &tv)
+ *     if ret > 0:             # <<<<<<<<<<<<<<
+ *         if c_getsockopt(sock_fd, C_SOL_SOCKET, C_SO_ERROR, &so_error, &optlen) < 0:
+ *             is_open = False
+ */
+  __pyx_t_1 = (__pyx_v_ret > 0);
+  if (__pyx_t_1) {
+
+    /* "scanner.pyx":120
+ *         ret = c_select(sock_fd + 1, NULL, &writefds, NULL, &tv)
+ *     if ret > 0:
+ *         if c_getsockopt(sock_fd, C_SOL_SOCKET, C_SO_ERROR, &so_error, &optlen) < 0:             # <<<<<<<<<<<<<<
+ *             is_open = False
+ *         elif so_error == 0:
+ */
+    __pyx_t_1 = (getsockopt(__pyx_v_sock_fd, SOL_SOCKET, SO_ERROR, (&__pyx_v_so_error), (&__pyx_v_optlen)) < 0);
+    if (__pyx_t_1) {
+
+      /* "scanner.pyx":121
+ *     if ret > 0:
+ *         if c_getsockopt(sock_fd, C_SOL_SOCKET, C_SO_ERROR, &so_error, &optlen) < 0:
+ *             is_open = False             # <<<<<<<<<<<<<<
+ *         elif so_error == 0:
+ *             is_open = True
+ */
+      __pyx_v_is_open = 0;
+
+      /* "scanner.pyx":120
+ *         ret = c_select(sock_fd + 1, NULL, &writefds, NULL, &tv)
+ *     if ret > 0:
+ *         if c_getsockopt(sock_fd, C_SOL_SOCKET, C_SO_ERROR, &so_error, &optlen) < 0:             # <<<<<<<<<<<<<<
+ *             is_open = False
+ *         elif so_error == 0:
+ */
+      goto __pyx_L19;
+    }
+
+    /* "scanner.pyx":122
+ *         if c_getsockopt(sock_fd, C_SOL_SOCKET, C_SO_ERROR, &so_error, &optlen) < 0:
+ *             is_open = False
+ *         elif so_error == 0:             # <<<<<<<<<<<<<<
+ *             is_open = True
+ *         else: is_open = False
+ */
+    __pyx_t_1 = (__pyx_v_so_error == 0);
+    if (__pyx_t_1) {
+
+      /* "scanner.pyx":123
+ *             is_open = False
+ *         elif so_error == 0:
+ *             is_open = True             # <<<<<<<<<<<<<<
+ *         else: is_open = False
+ *     elif ret == 0: is_open = False
+ */
+      __pyx_v_is_open = 1;
+
+      /* "scanner.pyx":122
+ *         if c_getsockopt(sock_fd, C_SOL_SOCKET, C_SO_ERROR, &so_error, &optlen) < 0:
+ *             is_open = False
+ *         elif so_error == 0:             # <<<<<<<<<<<<<<
+ *             is_open = True
+ *         else: is_open = False
+ */
+      goto __pyx_L19;
+    }
+
+    /* "scanner.pyx":124
+ *         elif so_error == 0:
+ *             is_open = True
+ *         else: is_open = False             # <<<<<<<<<<<<<<
+ *     elif ret == 0: is_open = False
+ *     else: is_open = False
+ */
+    /*else*/ {
+      __pyx_v_is_open = 0;
+    }
+    __pyx_L19:;
+
+    /* "scanner.pyx":119
+ *     with nogil:
+ *         ret = c_select(sock_fd + 1, NULL, &writefds, NULL, &tv)
+ *     if ret > 0:             # <<<<<<<<<<<<<<
+ *         if c_getsockopt(sock_fd, C_SOL_SOCKET, C_SO_ERROR, &so_error, &optlen) < 0:
+ *             is_open = False
+ */
+    goto __pyx_L18;
+  }
+
+  /* "scanner.pyx":125
+ *             is_open = True
+ *         else: is_open = False
+ *     elif ret == 0: is_open = False             # <<<<<<<<<<<<<<
+ *     else: is_open = False
+ *     c_close(sock_fd)
+ */
+  __pyx_t_1 = (__pyx_v_ret == 0);
+  if (__pyx_t_1) {
+    __pyx_v_is_open = 0;
+    goto __pyx_L18;
+  }
+
+  /* "scanner.pyx":126
+ *         else: is_open = False
+ *     elif ret == 0: is_open = False
+ *     else: is_open = False             # <<<<<<<<<<<<<<
+ *     c_close(sock_fd)
+ *     return is_open
+ */
+  /*else*/ {
+    __pyx_v_is_open = 0;
+  }
+  __pyx_L18:;
+
+  /* "scanner.pyx":127
+ *     elif ret == 0: is_open = False
+ *     else: is_open = False
+ *     c_close(sock_fd)             # <<<<<<<<<<<<<<
+ *     return is_open
+ *
+ */
+  (void)(close(__pyx_v_sock_fd));
+
+  /* "scanner.pyx":128
+ *     else: is_open = False
+ *     c_close(sock_fd)
+ *     return is_open             # <<<<<<<<<<<<<<
+ *
+ * def scan_port(bytes host, int port, double timeout_seconds=1.0):
+ */
+  __pyx_r = __pyx_v_is_open;
+  goto __pyx_L0;
+
+  /* "scanner.pyx":66
+ *     int C_EINPROGRESS "EINPROGRESS"
+ *
+ * cpdef bint c_scan_port(const char* host_ip, uint16_t port_num, double timeout_seconds) except -1:             # <<<<<<<<<<<<<<
+ *     cdef int sock_fd = -1
+ *     cdef c_sockaddr_in serv_addr
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7scanner_1c_scan_port(PyObject *__pyx_self,
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyMethodDef __pyx_mdef_7scanner_1c_scan_port = {"c_scan_port", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_1c_scan_port, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7scanner_1c_scan_port(PyObject *__pyx_self,
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  char const *__pyx_v_host_ip;
+  uint16_t __pyx_v_port_num;
+  double __pyx_v_timeout_seconds;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[3] = {0,0,0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("c_scan_port (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_MACROS
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_host_ip,&__pyx_n_s_port_num,&__pyx_n_s_timeout_seconds,0};
+    if (__pyx_kwds) {
+      Py_ssize_t kw_args;
+      switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = __Pyx_NumKwargs_FASTCALL(__pyx_kwds);
+      switch (__pyx_nargs) {
+        case  0:
+        if (likely((values[0] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_host_ip)) != 0)) {
+          (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
+          kw_args--;
+        }
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_port_num)) != 0)) {
+          (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
+          kw_args--;
+        }
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_scan_port", 1, 3, 3, 1); __PYX_ERR(0, 66, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_timeout_seconds)) != 0)) {
+          (void)__Pyx_Arg_NewRef_FASTCALL(values[2]);
+          kw_args--;
+        }
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
+        else {
+          __Pyx_RaiseArgtupleInvalid("c_scan_port", 1, 3, 3, 2); __PYX_ERR(0, 66, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        const Py_ssize_t kwd_pos_args = __pyx_nargs;
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "c_scan_port") < 0)) __PYX_ERR(0, 66, __pyx_L3_error)
+      }
+    } else if (unlikely(__pyx_nargs != 3)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
+      values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+      values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+    }
+    __pyx_v_host_ip = __Pyx_PyObject_AsString(values[0]); if (unlikely((!__pyx_v_host_ip) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
+    __pyx_v_port_num = __Pyx_PyInt_As_uint16_t(values[1]); if (unlikely((__pyx_v_port_num == ((uint16_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
+    __pyx_v_timeout_seconds = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_timeout_seconds == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 66, __pyx_L3_error)
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("c_scan_port", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 66, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  {
+    Py_ssize_t __pyx_temp;
+    for (__pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+      __Pyx_Arg_XDECREF_FASTCALL(values[__pyx_temp]);
+    }
+  }
+  __Pyx_AddTraceback("scanner.c_scan_port", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_7scanner_c_scan_port(__pyx_self, __pyx_v_host_ip, __pyx_v_port_num, __pyx_v_timeout_seconds);
+
+  /* function exit code */
+  {
+    Py_ssize_t __pyx_temp;
+    for (__pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+      __Pyx_Arg_XDECREF_FASTCALL(values[__pyx_temp]);
+    }
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7scanner_c_scan_port(CYTHON_UNUSED PyObject *__pyx_self, char const *__pyx_v_host_ip, uint16_t __pyx_v_port_num, double __pyx_v_timeout_seconds) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("c_scan_port", 1);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_f_7scanner_c_scan_port(__pyx_v_host_ip, __pyx_v_port_num, __pyx_v_timeout_seconds, 0); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 66, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("scanner.c_scan_port", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "scanner.pyx":130
+ *     return is_open
+ *
+ * def scan_port(bytes host, int port, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
+ *     """
+ *     (Cython Python-Wrapper) Scans a single port on a single host using c_scan_port.
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7scanner_3scan_port(PyObject *__pyx_self,
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_7scanner_2scan_port, "\n    (Cython Python-Wrapper) Scans a single port on a single host using c_scan_port.\n\n    Args:\n        host: The target host IP address (as bytes).\n        port: The target port number.\n        timeout_seconds: Connection timeout in seconds. Default is 1.0.\n\n    Returns:\n        True if the port is open, False otherwise.\n    ");
+static PyMethodDef __pyx_mdef_7scanner_3scan_port = {"scan_port", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_3scan_port, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_2scan_port};
+static PyObject *__pyx_pw_7scanner_3scan_port(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -2688,11 +3507,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 ) {
   PyObject *__pyx_v_host = 0;
   int __pyx_v_port;
+  double __pyx_v_timeout_seconds;
   #if !CYTHON_METH_FASTCALL
   CYTHON_UNUSED Py_ssize_t __pyx_nargs;
   #endif
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
+  PyObject* values[3] = {0,0,0};
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -2708,10 +3528,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_host,&__pyx_n_s_port,0};
+    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_host,&__pyx_n_s_port,&__pyx_n_s_timeout_seconds,0};
     if (__pyx_kwds) {
       Py_ssize_t kw_args;
       switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
         case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
@@ -2726,7 +3548,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 8, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -2734,27 +3556,43 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 8, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("scan_port", 1, 2, 2, 1); __PYX_ERR(0, 8, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("scan_port", 0, 2, 3, 1); __PYX_ERR(0, 130, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_timeout_seconds);
+          if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "scan_port") < 0)) __PYX_ERR(0, 8, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "scan_port") < 0)) __PYX_ERR(0, 130, __pyx_L3_error)
       }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
     } else {
-      values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
-      values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+      switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+        values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
     }
     __pyx_v_host = ((PyObject*)values[0]);
-    __pyx_v_port = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_port == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 8, __pyx_L3_error)
+    __pyx_v_port = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_port == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L3_error)
+    if (values[2]) {
+      __pyx_v_timeout_seconds = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_timeout_seconds == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L3_error)
+    } else {
+      __pyx_v_timeout_seconds = ((double)((double)1.0));
+    }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("scan_port", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 8, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("scan_port", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 130, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -2768,8 +3606,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_host), (&PyBytes_Type), 1, "host", 1))) __PYX_ERR(0, 8, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7scanner_scan_port(__pyx_self, __pyx_v_host, __pyx_v_port);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_host), (&PyBytes_Type), 1, "host", 1))) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7scanner_2scan_port(__pyx_self, __pyx_v_host, __pyx_v_port, __pyx_v_timeout_seconds);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2786,396 +3624,121 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7scanner_scan_port(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_host, int __pyx_v_port) {
-  PyObject *__pyx_v_s = NULL;
-  PyObject *__pyx_v_addr_tuple = NULL;
-  PyObject *__pyx_v_result = NULL;
+static PyObject *__pyx_pf_7scanner_2scan_port(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_host, int __pyx_v_port, double __pyx_v_timeout_seconds) {
+  char const *__pyx_v_host_c_str;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
+  int __pyx_t_1;
+  int __pyx_t_2;
+  char const *__pyx_t_3;
   PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  int __pyx_t_6;
-  int __pyx_t_7;
-  char const *__pyx_t_8;
-  PyObject *__pyx_t_9 = NULL;
-  PyObject *__pyx_t_10 = NULL;
-  PyObject *__pyx_t_11 = NULL;
-  PyObject *__pyx_t_12 = NULL;
-  PyObject *__pyx_t_13 = NULL;
-  PyObject *__pyx_t_14 = NULL;
-  int __pyx_t_15;
-  int __pyx_t_16;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("scan_port", 1);
 
-  /* "scanner.pyx":20
+  /* "scanner.pyx":142
+ *         True if the port is open, False otherwise.
  *     """
- *     # s will be a standard Python socket object
- *     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)             # <<<<<<<<<<<<<<
- *     s.settimeout(1.0)  # 1 second timeout
- *
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_socket); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_socket); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_socket); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_AF_INET); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_socket); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_SOCK_STREAM); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 20, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  __pyx_t_6 = 0;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-      __pyx_t_6 = 1;
-    }
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_t_4, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_6, 2+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  }
-  __pyx_v_s = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "scanner.pyx":21
- *     # s will be a standard Python socket object
- *     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
- *     s.settimeout(1.0)  # 1 second timeout             # <<<<<<<<<<<<<<
- *
- *     # host is bytes, decode to string for connect_ex
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_s, __pyx_n_s_settimeout); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = NULL;
-  __pyx_t_6 = 0;
-  #if CYTHON_UNPACK_METHODS
-  if (likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_5)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_5);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-      __pyx_t_6 = 1;
-    }
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_float_1_0};
-    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "scanner.pyx":24
- *
- *     # host is bytes, decode to string for connect_ex
- *     addr_tuple = (host.decode('utf-8'), port)             # <<<<<<<<<<<<<<
- *
- *     result = -1 # Default to error
- */
-  if (unlikely(__pyx_v_host == Py_None)) {
-    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-    __PYX_ERR(0, 24, __pyx_L1_error)
-  }
-  __pyx_t_1 = __Pyx_decode_bytes(__pyx_v_host, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeUTF8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_port); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 24, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 24, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_GIVEREF(__pyx_t_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_3)) __PYX_ERR(0, 24, __pyx_L1_error);
-  __pyx_t_1 = 0;
-  __pyx_t_3 = 0;
-  __pyx_v_addr_tuple = ((PyObject*)__pyx_t_5);
-  __pyx_t_5 = 0;
-
-  /* "scanner.pyx":26
- *     addr_tuple = (host.decode('utf-8'), port)
- *
- *     result = -1 # Default to error             # <<<<<<<<<<<<<<
- *     try:
- *         result = s.connect_ex(addr_tuple)
- */
-  __Pyx_INCREF(__pyx_int_neg_1);
-  __pyx_v_result = __pyx_int_neg_1;
-
-  /* "scanner.pyx":27
- *
- *     result = -1 # Default to error
- *     try:             # <<<<<<<<<<<<<<
- *         result = s.connect_ex(addr_tuple)
- *     finally:
- */
-  /*try:*/ {
-
-    /* "scanner.pyx":28
- *     result = -1 # Default to error
- *     try:
- *         result = s.connect_ex(addr_tuple)             # <<<<<<<<<<<<<<
- *     finally:
- *         s.close() # Ensure socket is closed
- */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_s, __pyx_n_s_connect_ex); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L4_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = NULL;
-    __pyx_t_6 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (likely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_1)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_1);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-        __pyx_t_6 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_addr_tuple};
-      __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 28, __pyx_L4_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    }
-    __Pyx_DECREF_SET(__pyx_v_result, __pyx_t_5);
-    __pyx_t_5 = 0;
-  }
-
-  /* "scanner.pyx":30
- *         result = s.connect_ex(addr_tuple)
- *     finally:
- *         s.close() # Ensure socket is closed             # <<<<<<<<<<<<<<
- *
- *     if result == 0:
- */
-  /*finally:*/ {
-    /*normal exit:*/{
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_s, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = NULL;
-      __pyx_t_6 = 0;
-      #if CYTHON_UNPACK_METHODS
-      if (likely(PyMethod_Check(__pyx_t_3))) {
-        __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
-        if (likely(__pyx_t_1)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-          __Pyx_INCREF(__pyx_t_1);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_3, function);
-          __pyx_t_6 = 1;
-        }
-      }
-      #endif
-      {
-        PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
-        __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
-        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      }
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      goto __pyx_L5;
-    }
-    __pyx_L4_error:;
-    /*exception exit:*/{
-      __Pyx_PyThreadState_declare
-      __Pyx_PyThreadState_assign
-      __pyx_t_9 = 0; __pyx_t_10 = 0; __pyx_t_11 = 0; __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0;
-      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_12, &__pyx_t_13, &__pyx_t_14);
-      if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_9, &__pyx_t_10, &__pyx_t_11) < 0)) __Pyx_ErrFetch(&__pyx_t_9, &__pyx_t_10, &__pyx_t_11);
-      __Pyx_XGOTREF(__pyx_t_9);
-      __Pyx_XGOTREF(__pyx_t_10);
-      __Pyx_XGOTREF(__pyx_t_11);
-      __Pyx_XGOTREF(__pyx_t_12);
-      __Pyx_XGOTREF(__pyx_t_13);
-      __Pyx_XGOTREF(__pyx_t_14);
-      __pyx_t_6 = __pyx_lineno; __pyx_t_7 = __pyx_clineno; __pyx_t_8 = __pyx_filename;
-      {
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_s, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L7_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_1 = NULL;
-        __pyx_t_15 = 0;
-        #if CYTHON_UNPACK_METHODS
-        if (likely(PyMethod_Check(__pyx_t_3))) {
-          __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
-          if (likely(__pyx_t_1)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-            __Pyx_INCREF(__pyx_t_1);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_3, function);
-            __pyx_t_15 = 1;
-          }
-        }
-        #endif
-        {
-          PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
-          __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_15, 0+__pyx_t_15);
-          __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L7_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        }
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      }
-      if (PY_MAJOR_VERSION >= 3) {
-        __Pyx_XGIVEREF(__pyx_t_12);
-        __Pyx_XGIVEREF(__pyx_t_13);
-        __Pyx_XGIVEREF(__pyx_t_14);
-        __Pyx_ExceptionReset(__pyx_t_12, __pyx_t_13, __pyx_t_14);
-      }
-      __Pyx_XGIVEREF(__pyx_t_9);
-      __Pyx_XGIVEREF(__pyx_t_10);
-      __Pyx_XGIVEREF(__pyx_t_11);
-      __Pyx_ErrRestore(__pyx_t_9, __pyx_t_10, __pyx_t_11);
-      __pyx_t_9 = 0; __pyx_t_10 = 0; __pyx_t_11 = 0; __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0;
-      __pyx_lineno = __pyx_t_6; __pyx_clineno = __pyx_t_7; __pyx_filename = __pyx_t_8;
-      goto __pyx_L1_error;
-      __pyx_L7_error:;
-      if (PY_MAJOR_VERSION >= 3) {
-        __Pyx_XGIVEREF(__pyx_t_12);
-        __Pyx_XGIVEREF(__pyx_t_13);
-        __Pyx_XGIVEREF(__pyx_t_14);
-        __Pyx_ExceptionReset(__pyx_t_12, __pyx_t_13, __pyx_t_14);
-      }
-      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-      __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0;
-      goto __pyx_L1_error;
-    }
-    __pyx_L5:;
-  }
-
-  /* "scanner.pyx":32
- *         s.close() # Ensure socket is closed
- *
- *     if result == 0:             # <<<<<<<<<<<<<<
- *         return True
- *     else:
- */
-  __pyx_t_16 = (__Pyx_PyInt_BoolEqObjC(__pyx_v_result, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_16 < 0))) __PYX_ERR(0, 32, __pyx_L1_error)
-  if (__pyx_t_16) {
-
-    /* "scanner.pyx":33
- *
- *     if result == 0:
- *         return True             # <<<<<<<<<<<<<<
- *     else:
+ *     if not (1 <= port <= 65535):             # <<<<<<<<<<<<<<
  *         return False
+ *     cdef const char* host_c_str = host
  */
-    __Pyx_XDECREF(__pyx_r);
-    __Pyx_INCREF(Py_True);
-    __pyx_r = Py_True;
-    goto __pyx_L0;
-
-    /* "scanner.pyx":32
- *         s.close() # Ensure socket is closed
- *
- *     if result == 0:             # <<<<<<<<<<<<<<
- *         return True
- *     else:
- */
+  __pyx_t_1 = (1 <= __pyx_v_port);
+  if (__pyx_t_1) {
+    __pyx_t_1 = (__pyx_v_port <= 0xFFFF);
   }
+  __pyx_t_2 = (!__pyx_t_1);
+  if (__pyx_t_2) {
 
-  /* "scanner.pyx":35
- *         return True
- *     else:
+    /* "scanner.pyx":143
+ *     """
+ *     if not (1 <= port <= 65535):
  *         return False             # <<<<<<<<<<<<<<
- *
- * def scan_ports_single_ip(bytes host, list ports_to_scan):
+ *     cdef const char* host_c_str = host
+ *     return c_scan_port(host_c_str, <uint16_t>port, timeout_seconds)
  */
-  /*else*/ {
     __Pyx_XDECREF(__pyx_r);
     __Pyx_INCREF(Py_False);
     __pyx_r = Py_False;
     goto __pyx_L0;
+
+    /* "scanner.pyx":142
+ *         True if the port is open, False otherwise.
+ *     """
+ *     if not (1 <= port <= 65535):             # <<<<<<<<<<<<<<
+ *         return False
+ *     cdef const char* host_c_str = host
+ */
   }
 
-  /* "scanner.pyx":8
+  /* "scanner.pyx":144
+ *     if not (1 <= port <= 65535):
+ *         return False
+ *     cdef const char* host_c_str = host             # <<<<<<<<<<<<<<
+ *     return c_scan_port(host_c_str, <uint16_t>port, timeout_seconds)
  *
- * # Ensure scan_port and scan_ports_single_ip are present
- * def scan_port(bytes host, int port):             # <<<<<<<<<<<<<<
+ */
+  if (unlikely(__pyx_v_host == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
+    __PYX_ERR(0, 144, __pyx_L1_error)
+  }
+  __pyx_t_3 = __Pyx_PyBytes_AsString(__pyx_v_host); if (unlikely((!__pyx_t_3) && PyErr_Occurred())) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_v_host_c_str = __pyx_t_3;
+
+  /* "scanner.pyx":145
+ *         return False
+ *     cdef const char* host_c_str = host
+ *     return c_scan_port(host_c_str, <uint16_t>port, timeout_seconds)             # <<<<<<<<<<<<<<
+ *
+ * def scan_ports_single_ip(bytes host, list ports_to_scan, double timeout_seconds=1.0):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_2 = __pyx_f_7scanner_c_scan_port(__pyx_v_host_c_str, ((uint16_t)__pyx_v_port), __pyx_v_timeout_seconds, 0); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_r = __pyx_t_4;
+  __pyx_t_4 = 0;
+  goto __pyx_L0;
+
+  /* "scanner.pyx":130
+ *     return is_open
+ *
+ * def scan_port(bytes host, int port, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
- *     (Cython) Scans a single port on a single host.
+ *     (Cython Python-Wrapper) Scans a single port on a single host using c_scan_port.
  */
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
   __Pyx_AddTraceback("scanner.scan_port", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_s);
-  __Pyx_XDECREF(__pyx_v_addr_tuple);
-  __Pyx_XDECREF(__pyx_v_result);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "scanner.pyx":37
- *         return False
+/* "scanner.pyx":147
+ *     return c_scan_port(host_c_str, <uint16_t>port, timeout_seconds)
  *
- * def scan_ports_single_ip(bytes host, list ports_to_scan):             # <<<<<<<<<<<<<<
+ * def scan_ports_single_ip(bytes host, list ports_to_scan, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans multiple ports on a single host.
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7scanner_3scan_ports_single_ip(PyObject *__pyx_self,
+static PyObject *__pyx_pw_7scanner_5scan_ports_single_ip(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_7scanner_2scan_ports_single_ip, "\n    (Cython) Scans multiple ports on a single host.\n\n    Args:\n        host: The target host IP address (as bytes).\n        ports_to_scan: A Python list of integer port numbers.\n\n    Returns:\n        A Python list of open port numbers found on the host.\n    ");
-static PyMethodDef __pyx_mdef_7scanner_3scan_ports_single_ip = {"scan_ports_single_ip", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_3scan_ports_single_ip, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_2scan_ports_single_ip};
-static PyObject *__pyx_pw_7scanner_3scan_ports_single_ip(PyObject *__pyx_self,
+PyDoc_STRVAR(__pyx_doc_7scanner_4scan_ports_single_ip, "\n    (Cython) Scans multiple ports on a single host.\n\n    Args:\n        host: The target host IP address (as bytes).\n        ports_to_scan: A list of port numbers.\n        timeout_seconds: Connection timeout for each port. Default is 1.0.\n\n    Returns:\n        A list of open port numbers.\n    ");
+static PyMethodDef __pyx_mdef_7scanner_5scan_ports_single_ip = {"scan_ports_single_ip", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_5scan_ports_single_ip, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_4scan_ports_single_ip};
+static PyObject *__pyx_pw_7scanner_5scan_ports_single_ip(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -3184,11 +3747,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 ) {
   PyObject *__pyx_v_host = 0;
   PyObject *__pyx_v_ports_to_scan = 0;
+  double __pyx_v_timeout_seconds;
   #if !CYTHON_METH_FASTCALL
   CYTHON_UNUSED Py_ssize_t __pyx_nargs;
   #endif
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
+  PyObject* values[3] = {0,0,0};
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -3204,10 +3768,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_host,&__pyx_n_s_ports_to_scan,0};
+    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_host,&__pyx_n_s_ports_to_scan,&__pyx_n_s_timeout_seconds,0};
     if (__pyx_kwds) {
       Py_ssize_t kw_args;
       switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
         case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
@@ -3222,7 +3788,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 37, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -3230,27 +3796,43 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 37, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("scan_ports_single_ip", 1, 2, 2, 1); __PYX_ERR(0, 37, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("scan_ports_single_ip", 0, 2, 3, 1); __PYX_ERR(0, 147, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_timeout_seconds);
+          if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "scan_ports_single_ip") < 0)) __PYX_ERR(0, 37, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "scan_ports_single_ip") < 0)) __PYX_ERR(0, 147, __pyx_L3_error)
       }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
     } else {
-      values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
-      values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+      switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+        values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
     }
     __pyx_v_host = ((PyObject*)values[0]);
     __pyx_v_ports_to_scan = ((PyObject*)values[1]);
+    if (values[2]) {
+      __pyx_v_timeout_seconds = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_timeout_seconds == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L3_error)
+    } else {
+      __pyx_v_timeout_seconds = ((double)((double)1.0));
+    }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("scan_ports_single_ip", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 37, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("scan_ports_single_ip", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 147, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3264,9 +3846,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_host), (&PyBytes_Type), 1, "host", 1))) __PYX_ERR(0, 37, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ports_to_scan), (&PyList_Type), 1, "ports_to_scan", 1))) __PYX_ERR(0, 37, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7scanner_2scan_ports_single_ip(__pyx_self, __pyx_v_host, __pyx_v_ports_to_scan);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_host), (&PyBytes_Type), 1, "host", 1))) __PYX_ERR(0, 147, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ports_to_scan), (&PyList_Type), 1, "ports_to_scan", 1))) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7scanner_4scan_ports_single_ip(__pyx_self, __pyx_v_host, __pyx_v_ports_to_scan, __pyx_v_timeout_seconds);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3283,46 +3865,48 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7scanner_2scan_ports_single_ip(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_host, PyObject *__pyx_v_ports_to_scan) {
-  PyObject *__pyx_v_open_ports = NULL;
-  PyObject *__pyx_v_port_num = NULL;
+static PyObject *__pyx_pf_7scanner_4scan_ports_single_ip(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_host, PyObject *__pyx_v_ports_to_scan, double __pyx_v_timeout_seconds) {
+  PyObject *__pyx_v_open_ports = 0;
+  int __pyx_v_port_num;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
   PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_4;
   PyObject *__pyx_t_5 = NULL;
-  int __pyx_t_6;
-  int __pyx_t_7;
-  int __pyx_t_8;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  int __pyx_t_9;
+  int __pyx_t_10;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("scan_ports_single_ip", 1);
 
-  /* "scanner.pyx":48
- *         A Python list of open port numbers found on the host.
+  /* "scanner.pyx":159
+ *         A list of open port numbers.
  *     """
- *     open_ports = [] # Standard Python list             # <<<<<<<<<<<<<<
- *     # cdef int port # Can still use Cython type for loop variable for minor optimization
- *     for port_num in ports_to_scan: # port_num will be a Python int
+ *     cdef list open_ports = []             # <<<<<<<<<<<<<<
+ *     cdef int port_num
+ *     for port_num in ports_to_scan:
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_open_ports = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "scanner.pyx":50
- *     open_ports = [] # Standard Python list
- *     # cdef int port # Can still use Cython type for loop variable for minor optimization
- *     for port_num in ports_to_scan: # port_num will be a Python int             # <<<<<<<<<<<<<<
- *         if scan_port(host, port_num):
+  /* "scanner.pyx":161
+ *     cdef list open_ports = []
+ *     cdef int port_num
+ *     for port_num in ports_to_scan:             # <<<<<<<<<<<<<<
+ *         if scan_port(host, port_num, timeout_seconds): # Pass timeout
  *             open_ports.append(port_num)
  */
   if (unlikely(__pyx_v_ports_to_scan == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 50, __pyx_L1_error)
+    __PYX_ERR(0, 161, __pyx_L1_error)
   }
   __pyx_t_1 = __pyx_v_ports_to_scan; __Pyx_INCREF(__pyx_t_1);
   __pyx_t_2 = 0;
@@ -3330,98 +3914,108 @@ static PyObject *__pyx_pf_7scanner_2scan_ports_single_ip(CYTHON_UNUSED PyObject 
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
       #if !CYTHON_ASSUME_SAFE_MACROS
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 50, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 161, __pyx_L1_error)
       #endif
       if (__pyx_t_2 >= __pyx_temp) break;
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely((0 < 0))) __PYX_ERR(0, 50, __pyx_L1_error)
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely((0 < 0))) __PYX_ERR(0, 161, __pyx_L1_error)
     #else
-    __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
-    __Pyx_XDECREF_SET(__pyx_v_port_num, __pyx_t_3);
-    __pyx_t_3 = 0;
+    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 161, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_v_port_num = __pyx_t_4;
 
-    /* "scanner.pyx":51
- *     # cdef int port # Can still use Cython type for loop variable for minor optimization
- *     for port_num in ports_to_scan: # port_num will be a Python int
- *         if scan_port(host, port_num):             # <<<<<<<<<<<<<<
+    /* "scanner.pyx":162
+ *     cdef int port_num
+ *     for port_num in ports_to_scan:
+ *         if scan_port(host, port_num, timeout_seconds): # Pass timeout             # <<<<<<<<<<<<<<
  *             open_ports.append(port_num)
  *     return open_ports
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_scan_port); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 51, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = NULL;
-    __pyx_t_6 = 0;
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_scan_port); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_port_num); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_7 = PyFloat_FromDouble(__pyx_v_timeout_seconds); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = NULL;
+    __pyx_t_4 = 0;
     #if CYTHON_UNPACK_METHODS
-    if (unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
-      if (likely(__pyx_t_5)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-        __Pyx_INCREF(__pyx_t_5);
+    if (unlikely(PyMethod_Check(__pyx_t_5))) {
+      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_5);
+      if (likely(__pyx_t_8)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+        __Pyx_INCREF(__pyx_t_8);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
-        __pyx_t_6 = 1;
+        __Pyx_DECREF_SET(__pyx_t_5, function);
+        __pyx_t_4 = 1;
       }
     }
     #endif
     {
-      PyObject *__pyx_callargs[3] = {__pyx_t_5, __pyx_v_host, __pyx_v_port_num};
-      __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+1-__pyx_t_6, 2+__pyx_t_6);
-      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 51, __pyx_L1_error)
+      PyObject *__pyx_callargs[4] = {__pyx_t_8, __pyx_v_host, __pyx_t_6, __pyx_t_7};
+      __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_4, 3+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 51, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_9 < 0))) __PYX_ERR(0, 162, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (__pyx_t_7) {
+    if (__pyx_t_9) {
 
-      /* "scanner.pyx":52
- *     for port_num in ports_to_scan: # port_num will be a Python int
- *         if scan_port(host, port_num):
+      /* "scanner.pyx":163
+ *     for port_num in ports_to_scan:
+ *         if scan_port(host, port_num, timeout_seconds): # Pass timeout
  *             open_ports.append(port_num)             # <<<<<<<<<<<<<<
  *     return open_ports
- * # End of pre-existing functions
+ *
  */
-      __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_open_ports, __pyx_v_port_num); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 52, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_port_num); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_open_ports, __pyx_t_3); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "scanner.pyx":51
- *     # cdef int port # Can still use Cython type for loop variable for minor optimization
- *     for port_num in ports_to_scan: # port_num will be a Python int
- *         if scan_port(host, port_num):             # <<<<<<<<<<<<<<
+      /* "scanner.pyx":162
+ *     cdef int port_num
+ *     for port_num in ports_to_scan:
+ *         if scan_port(host, port_num, timeout_seconds): # Pass timeout             # <<<<<<<<<<<<<<
  *             open_ports.append(port_num)
  *     return open_ports
  */
     }
 
-    /* "scanner.pyx":50
- *     open_ports = [] # Standard Python list
- *     # cdef int port # Can still use Cython type for loop variable for minor optimization
- *     for port_num in ports_to_scan: # port_num will be a Python int             # <<<<<<<<<<<<<<
- *         if scan_port(host, port_num):
+    /* "scanner.pyx":161
+ *     cdef list open_ports = []
+ *     cdef int port_num
+ *     for port_num in ports_to_scan:             # <<<<<<<<<<<<<<
+ *         if scan_port(host, port_num, timeout_seconds): # Pass timeout
  *             open_ports.append(port_num)
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "scanner.pyx":53
- *         if scan_port(host, port_num):
+  /* "scanner.pyx":164
+ *         if scan_port(host, port_num, timeout_seconds): # Pass timeout
  *             open_ports.append(port_num)
  *     return open_ports             # <<<<<<<<<<<<<<
- * # End of pre-existing functions
  *
+ * def _parse_ip_range_py(ip_range_str_py):
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_open_ports);
   __pyx_r = __pyx_v_open_ports;
   goto __pyx_L0;
 
-  /* "scanner.pyx":37
- *         return False
+  /* "scanner.pyx":147
+ *     return c_scan_port(host_c_str, <uint16_t>port, timeout_seconds)
  *
- * def scan_ports_single_ip(bytes host, list ports_to_scan):             # <<<<<<<<<<<<<<
+ * def scan_ports_single_ip(bytes host, list ports_to_scan, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans multiple ports on a single host.
  */
@@ -3430,37 +4024,38 @@ static PyObject *__pyx_pf_7scanner_2scan_ports_single_ip(CYTHON_UNUSED PyObject 
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_AddTraceback("scanner.scan_ports_single_ip", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_open_ports);
-  __Pyx_XDECREF(__pyx_v_port_num);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "scanner.pyx":58
+/* "scanner.pyx":166
+ *     return open_ports
  *
- * # Helper function using standard Python for ipaddress module
  * def _parse_ip_range_py(ip_range_str_py):             # <<<<<<<<<<<<<<
  *     """
  *     (Python, called by Cython) Parses an IP range string into a list of IPs.
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7scanner_5_parse_ip_range_py(PyObject *__pyx_self,
+static PyObject *__pyx_pw_7scanner_7_parse_ip_range_py(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_7scanner_4_parse_ip_range_py, "\n    (Python, called by Cython) Parses an IP range string into a list of IPs.\n    Handles single IPs and hyphenated ranges (e.g., \"192.168.1.1-192.168.1.5\").\n    Uses the 'ipaddress' module. Pure Python helper for Cython functions.\n\n    Args:\n        ip_range_str_py: The IP range string.\n\n    Returns:\n        A list of IP address strings, or an empty list on error/invalid input.\n    ");
-static PyMethodDef __pyx_mdef_7scanner_5_parse_ip_range_py = {"_parse_ip_range_py", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_5_parse_ip_range_py, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_4_parse_ip_range_py};
-static PyObject *__pyx_pw_7scanner_5_parse_ip_range_py(PyObject *__pyx_self,
+PyDoc_STRVAR(__pyx_doc_7scanner_6_parse_ip_range_py, "\n    (Python, called by Cython) Parses an IP range string into a list of IPs.\n    ");
+static PyMethodDef __pyx_mdef_7scanner_7_parse_ip_range_py = {"_parse_ip_range_py", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_7_parse_ip_range_py, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_6_parse_ip_range_py};
+static PyObject *__pyx_pw_7scanner_7_parse_ip_range_py(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -3504,12 +4099,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 58, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 166, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "_parse_ip_range_py") < 0)) __PYX_ERR(0, 58, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "_parse_ip_range_py") < 0)) __PYX_ERR(0, 166, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
@@ -3520,7 +4115,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_parse_ip_range_py", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 58, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_parse_ip_range_py", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 166, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3534,7 +4129,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7scanner_4_parse_ip_range_py(__pyx_self, __pyx_v_ip_range_str_py);
+  __pyx_r = __pyx_pf_7scanner_6_parse_ip_range_py(__pyx_self, __pyx_v_ip_range_str_py);
 
   /* function exit code */
   {
@@ -3547,7 +4142,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_range_str_py) {
+static PyObject *__pyx_pf_7scanner_6_parse_ip_range_py(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_range_str_py) {
   PyObject *__pyx_v_start_ip_str = NULL;
   PyObject *__pyx_v_end_ip_str = NULL;
   PyObject *__pyx_v_start_ip = NULL;
@@ -3579,43 +4174,27 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_parse_ip_range_py", 1);
 
-  /* "scanner.pyx":71
+  /* "scanner.pyx":170
+ *     (Python, called by Cython) Parses an IP range string into a list of IPs.
  *     """
- *     # This function is pure Python, so use Python types (str, list)
- *     if not isinstance(ip_range_str_py, str):             # <<<<<<<<<<<<<<
- *         return []
- *
+ *     if not isinstance(ip_range_str_py, str): return []             # <<<<<<<<<<<<<<
+ *     try:
+ *         if '-' in ip_range_str_py:
  */
   __pyx_t_1 = PyUnicode_Check(__pyx_v_ip_range_str_py);
   __pyx_t_2 = (!__pyx_t_1);
   if (__pyx_t_2) {
-
-    /* "scanner.pyx":72
- *     # This function is pure Python, so use Python types (str, list)
- *     if not isinstance(ip_range_str_py, str):
- *         return []             # <<<<<<<<<<<<<<
- *
- *     try:
- */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 72, __pyx_L1_error)
+    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 170, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L0;
-
-    /* "scanner.pyx":71
- *     """
- *     # This function is pure Python, so use Python types (str, list)
- *     if not isinstance(ip_range_str_py, str):             # <<<<<<<<<<<<<<
- *         return []
- *
- */
   }
 
-  /* "scanner.pyx":74
- *         return []
- *
+  /* "scanner.pyx":171
+ *     """
+ *     if not isinstance(ip_range_str_py, str): return []
  *     try:             # <<<<<<<<<<<<<<
  *         if '-' in ip_range_str_py:
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)
@@ -3629,26 +4208,26 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
     __Pyx_XGOTREF(__pyx_t_6);
     /*try:*/ {
 
-      /* "scanner.pyx":75
- *
+      /* "scanner.pyx":172
+ *     if not isinstance(ip_range_str_py, str): return []
  *     try:
  *         if '-' in ip_range_str_py:             # <<<<<<<<<<<<<<
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)
  *             start_ip = ipaddress.ip_address(start_ip_str.strip())
  */
-      __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_kp_u_, __pyx_v_ip_range_str_py, Py_EQ)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 75, __pyx_L4_error)
+      __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_kp_u_, __pyx_v_ip_range_str_py, Py_EQ)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 172, __pyx_L4_error)
       if (__pyx_t_2) {
 
-        /* "scanner.pyx":76
+        /* "scanner.pyx":173
  *     try:
  *         if '-' in ip_range_str_py:
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)             # <<<<<<<<<<<<<<
  *             start_ip = ipaddress.ip_address(start_ip_str.strip())
  *             end_ip = ipaddress.ip_address(end_ip_str.strip())
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ip_range_str_py, __pyx_n_s_split); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ip_range_str_py, __pyx_n_s_split); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 76, __pyx_L4_error)
+        __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 173, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if ((likely(PyTuple_CheckExact(__pyx_t_7))) || (PyList_CheckExact(__pyx_t_7))) {
@@ -3657,7 +4236,7 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           if (unlikely(size != 2)) {
             if (size > 2) __Pyx_RaiseTooManyValuesError(2);
             else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-            __PYX_ERR(0, 76, __pyx_L4_error)
+            __PYX_ERR(0, 173, __pyx_L4_error)
           }
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
           if (likely(PyTuple_CheckExact(sequence))) {
@@ -3670,15 +4249,15 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           __Pyx_INCREF(__pyx_t_3);
           __Pyx_INCREF(__pyx_t_8);
           #else
-          __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L4_error)
+          __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 76, __pyx_L4_error)
+          __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 173, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_8);
           #endif
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         } else {
           Py_ssize_t index = -1;
-          __pyx_t_9 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 76, __pyx_L4_error)
+          __pyx_t_9 = PyObject_GetIter(__pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 173, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __pyx_t_10 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_9);
@@ -3686,7 +4265,7 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           __Pyx_GOTREF(__pyx_t_3);
           index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L11_unpacking_failed;
           __Pyx_GOTREF(__pyx_t_8);
-          if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 76, __pyx_L4_error)
+          if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 173, __pyx_L4_error)
           __pyx_t_10 = NULL;
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           goto __pyx_L12_unpacking_done;
@@ -3694,7 +4273,7 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __pyx_t_10 = NULL;
           if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-          __PYX_ERR(0, 76, __pyx_L4_error)
+          __PYX_ERR(0, 173, __pyx_L4_error)
           __pyx_L12_unpacking_done:;
         }
         __pyx_v_start_ip_str = __pyx_t_3;
@@ -3702,19 +4281,19 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
         __pyx_v_end_ip_str = __pyx_t_8;
         __pyx_t_8 = 0;
 
-        /* "scanner.pyx":77
+        /* "scanner.pyx":174
  *         if '-' in ip_range_str_py:
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)
  *             start_ip = ipaddress.ip_address(start_ip_str.strip())             # <<<<<<<<<<<<<<
  *             end_ip = ipaddress.ip_address(end_ip_str.strip())
- *
+ *             if start_ip.version != end_ip.version: return []
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_ipaddress); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 77, __pyx_L4_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_ipaddress); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 174, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_ip_address); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 77, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_ip_address); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 174, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_start_ip_str, __pyx_n_s_strip); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 77, __pyx_L4_error)
+        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_start_ip_str, __pyx_n_s_strip); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 174, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_9);
         __pyx_t_11 = NULL;
         __pyx_t_12 = 0;
@@ -3734,7 +4313,7 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           PyObject *__pyx_callargs[2] = {__pyx_t_11, NULL};
           __pyx_t_8 = __Pyx_PyObject_FastCall(__pyx_t_9, __pyx_callargs+1-__pyx_t_12, 0+__pyx_t_12);
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 77, __pyx_L4_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 174, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
@@ -3757,26 +4336,26 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           __pyx_t_7 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_12, 1+__pyx_t_12);
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 77, __pyx_L4_error)
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 174, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
         __pyx_v_start_ip = __pyx_t_7;
         __pyx_t_7 = 0;
 
-        /* "scanner.pyx":78
+        /* "scanner.pyx":175
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)
  *             start_ip = ipaddress.ip_address(start_ip_str.strip())
  *             end_ip = ipaddress.ip_address(end_ip_str.strip())             # <<<<<<<<<<<<<<
- *
- *             if start_ip.version != end_ip.version:
+ *             if start_ip.version != end_ip.version: return []
+ *             result_ips = []
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_ipaddress); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L4_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_ipaddress); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_ip_address); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 78, __pyx_L4_error)
+        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_ip_address); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 175, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_end_ip_str, __pyx_n_s_strip); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 78, __pyx_L4_error)
+        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_end_ip_str, __pyx_n_s_strip); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 175, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_9);
         __pyx_t_11 = NULL;
         __pyx_t_12 = 0;
@@ -3796,7 +4375,7 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           PyObject *__pyx_callargs[2] = {__pyx_t_11, NULL};
           __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_9, __pyx_callargs+1-__pyx_t_12, 0+__pyx_t_12);
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L4_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
@@ -3819,184 +4398,136 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           __pyx_t_7 = __Pyx_PyObject_FastCall(__pyx_t_8, __pyx_callargs+1-__pyx_t_12, 1+__pyx_t_12);
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 78, __pyx_L4_error)
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
         __pyx_v_end_ip = __pyx_t_7;
         __pyx_t_7 = 0;
 
-        /* "scanner.pyx":80
+        /* "scanner.pyx":176
+ *             start_ip = ipaddress.ip_address(start_ip_str.strip())
  *             end_ip = ipaddress.ip_address(end_ip_str.strip())
- *
- *             if start_ip.version != end_ip.version:             # <<<<<<<<<<<<<<
- *                 return [] # IP version mismatch
- *
+ *             if start_ip.version != end_ip.version: return []             # <<<<<<<<<<<<<<
+ *             result_ips = []
+ *             current_ip_int = int(start_ip)
  */
-        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_start_ip, __pyx_n_s_version); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 80, __pyx_L4_error)
+        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_start_ip, __pyx_n_s_version); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 176, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_end_ip, __pyx_n_s_version); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 80, __pyx_L4_error)
+        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_end_ip, __pyx_n_s_version); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 176, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_3 = PyObject_RichCompare(__pyx_t_7, __pyx_t_8, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 80, __pyx_L4_error)
+        __pyx_t_3 = PyObject_RichCompare(__pyx_t_7, __pyx_t_8, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L4_error)
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 80, __pyx_L4_error)
+        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 176, __pyx_L4_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if (__pyx_t_2) {
-
-          /* "scanner.pyx":81
- *
- *             if start_ip.version != end_ip.version:
- *                 return [] # IP version mismatch             # <<<<<<<<<<<<<<
- *
- *             result_ips = []
- */
           __Pyx_XDECREF(__pyx_r);
-          __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 81, __pyx_L4_error)
+          __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_3);
           __pyx_r = __pyx_t_3;
           __pyx_t_3 = 0;
           goto __pyx_L8_try_return;
-
-          /* "scanner.pyx":80
- *             end_ip = ipaddress.ip_address(end_ip_str.strip())
- *
- *             if start_ip.version != end_ip.version:             # <<<<<<<<<<<<<<
- *                 return [] # IP version mismatch
- *
- */
         }
 
-        /* "scanner.pyx":83
- *                 return [] # IP version mismatch
- *
+        /* "scanner.pyx":177
+ *             end_ip = ipaddress.ip_address(end_ip_str.strip())
+ *             if start_ip.version != end_ip.version: return []
  *             result_ips = []             # <<<<<<<<<<<<<<
  *             current_ip_int = int(start_ip)
  *             end_ip_int = int(end_ip)
  */
-        __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 83, __pyx_L4_error)
+        __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_v_result_ips = ((PyObject*)__pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "scanner.pyx":84
- *
+        /* "scanner.pyx":178
+ *             if start_ip.version != end_ip.version: return []
  *             result_ips = []
  *             current_ip_int = int(start_ip)             # <<<<<<<<<<<<<<
  *             end_ip_int = int(end_ip)
- *
+ *             if current_ip_int > end_ip_int: return []
  */
-        __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_v_start_ip); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 84, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_v_start_ip); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_v_current_ip_int = __pyx_t_3;
         __pyx_t_3 = 0;
 
-        /* "scanner.pyx":85
+        /* "scanner.pyx":179
  *             result_ips = []
  *             current_ip_int = int(start_ip)
  *             end_ip_int = int(end_ip)             # <<<<<<<<<<<<<<
- *
- *             if current_ip_int > end_ip_int:
+ *             if current_ip_int > end_ip_int: return []
+ *             if (end_ip_int - current_ip_int + 1) > 4096: return []
  */
-        __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_v_end_ip); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_v_end_ip); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_v_end_ip_int = __pyx_t_3;
         __pyx_t_3 = 0;
 
-        /* "scanner.pyx":87
+        /* "scanner.pyx":180
+ *             current_ip_int = int(start_ip)
  *             end_ip_int = int(end_ip)
- *
- *             if current_ip_int > end_ip_int:             # <<<<<<<<<<<<<<
- *                 return [] # Start IP is greater than end IP
- *
+ *             if current_ip_int > end_ip_int: return []             # <<<<<<<<<<<<<<
+ *             if (end_ip_int - current_ip_int + 1) > 4096: return []
+ *             for ip_int_val in range(current_ip_int, end_ip_int + 1):
  */
-        __pyx_t_3 = PyObject_RichCompare(__pyx_v_current_ip_int, __pyx_v_end_ip_int, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 87, __pyx_L4_error)
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 87, __pyx_L4_error)
+        __pyx_t_3 = PyObject_RichCompare(__pyx_v_current_ip_int, __pyx_v_end_ip_int, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L4_error)
+        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 180, __pyx_L4_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if (__pyx_t_2) {
-
-          /* "scanner.pyx":88
- *
- *             if current_ip_int > end_ip_int:
- *                 return [] # Start IP is greater than end IP             # <<<<<<<<<<<<<<
- *
- *             # Limit the range to avoid excessive memory/time usage for huge ranges
- */
           __Pyx_XDECREF(__pyx_r);
-          __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 88, __pyx_L4_error)
+          __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_3);
           __pyx_r = __pyx_t_3;
           __pyx_t_3 = 0;
           goto __pyx_L8_try_return;
-
-          /* "scanner.pyx":87
- *             end_ip_int = int(end_ip)
- *
- *             if current_ip_int > end_ip_int:             # <<<<<<<<<<<<<<
- *                 return [] # Start IP is greater than end IP
- *
- */
         }
 
-        /* "scanner.pyx":92
- *             # Limit the range to avoid excessive memory/time usage for huge ranges
- *             # For example, limit to a /20 range (4096 addresses) or similar
- *             if (end_ip_int - current_ip_int + 1) > 4096: # Arbitrary limit             # <<<<<<<<<<<<<<
- *                  # Consider raising an error or logging a warning
- *                 return []
+        /* "scanner.pyx":181
+ *             end_ip_int = int(end_ip)
+ *             if current_ip_int > end_ip_int: return []
+ *             if (end_ip_int - current_ip_int + 1) > 4096: return []             # <<<<<<<<<<<<<<
+ *             for ip_int_val in range(current_ip_int, end_ip_int + 1):
+ *                 result_ips.append(str(ipaddress.ip_address(ip_int_val)))
  */
-        __pyx_t_3 = PyNumber_Subtract(__pyx_v_end_ip_int, __pyx_v_current_ip_int); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 92, __pyx_L4_error)
+        __pyx_t_3 = PyNumber_Subtract(__pyx_v_end_ip_int, __pyx_v_current_ip_int); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_8 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 92, __pyx_L4_error)
+        __pyx_t_8 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 181, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = PyObject_RichCompare(__pyx_t_8, __pyx_int_4096, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 92, __pyx_L4_error)
+        __pyx_t_3 = PyObject_RichCompare(__pyx_t_8, __pyx_int_4096, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L4_error)
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 92, __pyx_L4_error)
+        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 181, __pyx_L4_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if (__pyx_t_2) {
-
-          /* "scanner.pyx":94
- *             if (end_ip_int - current_ip_int + 1) > 4096: # Arbitrary limit
- *                  # Consider raising an error or logging a warning
- *                 return []             # <<<<<<<<<<<<<<
- *
- *
- */
           __Pyx_XDECREF(__pyx_r);
-          __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 94, __pyx_L4_error)
+          __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_3);
           __pyx_r = __pyx_t_3;
           __pyx_t_3 = 0;
           goto __pyx_L8_try_return;
-
-          /* "scanner.pyx":92
- *             # Limit the range to avoid excessive memory/time usage for huge ranges
- *             # For example, limit to a /20 range (4096 addresses) or similar
- *             if (end_ip_int - current_ip_int + 1) > 4096: # Arbitrary limit             # <<<<<<<<<<<<<<
- *                  # Consider raising an error or logging a warning
- *                 return []
- */
         }
 
-        /* "scanner.pyx":97
- *
- *
+        /* "scanner.pyx":182
+ *             if current_ip_int > end_ip_int: return []
+ *             if (end_ip_int - current_ip_int + 1) > 4096: return []
  *             for ip_int_val in range(current_ip_int, end_ip_int + 1):             # <<<<<<<<<<<<<<
  *                 result_ips.append(str(ipaddress.ip_address(ip_int_val)))
  *             return result_ips
  */
-        __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_end_ip_int, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_end_ip_int, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 97, __pyx_L4_error)
+        __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 182, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_INCREF(__pyx_v_current_ip_int);
         __Pyx_GIVEREF(__pyx_v_current_ip_int);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v_current_ip_int)) __PYX_ERR(0, 97, __pyx_L4_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v_current_ip_int)) __PYX_ERR(0, 182, __pyx_L4_error);
         __Pyx_GIVEREF(__pyx_t_3);
-        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_3)) __PYX_ERR(0, 97, __pyx_L4_error);
+        if (__Pyx_PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_3)) __PYX_ERR(0, 182, __pyx_L4_error);
         __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
@@ -4004,9 +4535,9 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           __pyx_t_13 = 0;
           __pyx_t_14 = NULL;
         } else {
-          __pyx_t_13 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 97, __pyx_L4_error)
+          __pyx_t_13 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 182, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_14 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 97, __pyx_L4_error)
+          __pyx_t_14 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 182, __pyx_L4_error)
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         for (;;) {
@@ -4015,28 +4546,28 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
               {
                 Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_8);
                 #if !CYTHON_ASSUME_SAFE_MACROS
-                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 97, __pyx_L4_error)
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 182, __pyx_L4_error)
                 #endif
                 if (__pyx_t_13 >= __pyx_temp) break;
               }
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_3 = PyList_GET_ITEM(__pyx_t_8, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely((0 < 0))) __PYX_ERR(0, 97, __pyx_L4_error)
+              __pyx_t_3 = PyList_GET_ITEM(__pyx_t_8, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely((0 < 0))) __PYX_ERR(0, 182, __pyx_L4_error)
               #else
-              __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_8, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L4_error)
+              __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_8, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L4_error)
               __Pyx_GOTREF(__pyx_t_3);
               #endif
             } else {
               {
                 Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_8);
                 #if !CYTHON_ASSUME_SAFE_MACROS
-                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 97, __pyx_L4_error)
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 182, __pyx_L4_error)
                 #endif
                 if (__pyx_t_13 >= __pyx_temp) break;
               }
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_8, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely((0 < 0))) __PYX_ERR(0, 97, __pyx_L4_error)
+              __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_8, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely((0 < 0))) __PYX_ERR(0, 182, __pyx_L4_error)
               #else
-              __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_8, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L4_error)
+              __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_8, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L4_error)
               __Pyx_GOTREF(__pyx_t_3);
               #endif
             }
@@ -4046,7 +4577,7 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
               PyObject* exc_type = PyErr_Occurred();
               if (exc_type) {
                 if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                else __PYX_ERR(0, 97, __pyx_L4_error)
+                else __PYX_ERR(0, 182, __pyx_L4_error)
               }
               break;
             }
@@ -4055,16 +4586,16 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           __Pyx_XDECREF_SET(__pyx_v_ip_int_val, __pyx_t_3);
           __pyx_t_3 = 0;
 
-          /* "scanner.pyx":98
- *
+          /* "scanner.pyx":183
+ *             if (end_ip_int - current_ip_int + 1) > 4096: return []
  *             for ip_int_val in range(current_ip_int, end_ip_int + 1):
  *                 result_ips.append(str(ipaddress.ip_address(ip_int_val)))             # <<<<<<<<<<<<<<
  *             return result_ips
  *         else:
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_ipaddress); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 98, __pyx_L4_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_ipaddress); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 183, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_ip_address); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 98, __pyx_L4_error)
+          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_ip_address); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 183, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __pyx_t_7 = NULL;
@@ -4085,19 +4616,19 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
             PyObject *__pyx_callargs[2] = {__pyx_t_7, __pyx_v_ip_int_val};
             __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_9, __pyx_callargs+1-__pyx_t_12, 1+__pyx_t_12);
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 98, __pyx_L4_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L4_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           }
-          __pyx_t_9 = __Pyx_PyObject_Str(__pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 98, __pyx_L4_error)
+          __pyx_t_9 = __Pyx_PyObject_Str(__pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 183, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_15 = __Pyx_PyList_Append(__pyx_v_result_ips, __pyx_t_9); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 98, __pyx_L4_error)
+          __pyx_t_15 = __Pyx_PyList_Append(__pyx_v_result_ips, __pyx_t_9); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 183, __pyx_L4_error)
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-          /* "scanner.pyx":97
- *
- *
+          /* "scanner.pyx":182
+ *             if current_ip_int > end_ip_int: return []
+ *             if (end_ip_int - current_ip_int + 1) > 4096: return []
  *             for ip_int_val in range(current_ip_int, end_ip_int + 1):             # <<<<<<<<<<<<<<
  *                 result_ips.append(str(ipaddress.ip_address(ip_int_val)))
  *             return result_ips
@@ -4105,20 +4636,20 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
         }
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-        /* "scanner.pyx":99
+        /* "scanner.pyx":184
  *             for ip_int_val in range(current_ip_int, end_ip_int + 1):
  *                 result_ips.append(str(ipaddress.ip_address(ip_int_val)))
  *             return result_ips             # <<<<<<<<<<<<<<
  *         else:
- *             # Validate and return as a list containing one IP
+ *             single_ip = ipaddress.ip_address(ip_range_str_py.strip())
  */
         __Pyx_XDECREF(__pyx_r);
         __Pyx_INCREF(__pyx_v_result_ips);
         __pyx_r = __pyx_v_result_ips;
         goto __pyx_L8_try_return;
 
-        /* "scanner.pyx":75
- *
+        /* "scanner.pyx":172
+ *     if not isinstance(ip_range_str_py, str): return []
  *     try:
  *         if '-' in ip_range_str_py:             # <<<<<<<<<<<<<<
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)
@@ -4126,20 +4657,20 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
  */
       }
 
-      /* "scanner.pyx":102
+      /* "scanner.pyx":186
+ *             return result_ips
  *         else:
- *             # Validate and return as a list containing one IP
  *             single_ip = ipaddress.ip_address(ip_range_str_py.strip())             # <<<<<<<<<<<<<<
  *             return [str(single_ip)]
- *     except ValueError:
+ *     except ValueError: return []
  */
       /*else*/ {
-        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_ipaddress); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 102, __pyx_L4_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_ipaddress); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 186, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_ip_address); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_ip_address); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_ip_range_str_py, __pyx_n_s_strip); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 102, __pyx_L4_error)
+        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_ip_range_str_py, __pyx_n_s_strip); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 186, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_t_11 = NULL;
         __pyx_t_12 = 0;
@@ -4159,7 +4690,7 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           PyObject *__pyx_callargs[2] = {__pyx_t_11, NULL};
           __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_7, __pyx_callargs+1-__pyx_t_12, 0+__pyx_t_12);
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 102, __pyx_L4_error)
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 186, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         }
@@ -4182,36 +4713,36 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
           __pyx_t_8 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_12, 1+__pyx_t_12);
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 102, __pyx_L4_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 186, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
         __pyx_v_single_ip = __pyx_t_8;
         __pyx_t_8 = 0;
 
-        /* "scanner.pyx":103
- *             # Validate and return as a list containing one IP
+        /* "scanner.pyx":187
+ *         else:
  *             single_ip = ipaddress.ip_address(ip_range_str_py.strip())
  *             return [str(single_ip)]             # <<<<<<<<<<<<<<
- *     except ValueError:
- *         return [] # Return empty list on error like invalid IP format
+ *     except ValueError: return []
+ *
  */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_8 = __Pyx_PyObject_Str(__pyx_v_single_ip); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 103, __pyx_L4_error)
+        __pyx_t_8 = __Pyx_PyObject_Str(__pyx_v_single_ip); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 187, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 103, __pyx_L4_error)
+        __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 187, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GIVEREF(__pyx_t_8);
-        if (__Pyx_PyList_SET_ITEM(__pyx_t_3, 0, __pyx_t_8)) __PYX_ERR(0, 103, __pyx_L4_error);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_3, 0, __pyx_t_8)) __PYX_ERR(0, 187, __pyx_L4_error);
         __pyx_t_8 = 0;
         __pyx_r = __pyx_t_3;
         __pyx_t_3 = 0;
         goto __pyx_L8_try_return;
       }
 
-      /* "scanner.pyx":74
- *         return []
- *
+      /* "scanner.pyx":171
+ *     """
+ *     if not isinstance(ip_range_str_py, str): return []
  *     try:             # <<<<<<<<<<<<<<
  *         if '-' in ip_range_str_py:
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)
@@ -4224,30 +4755,22 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "scanner.pyx":104
+    /* "scanner.pyx":188
  *             single_ip = ipaddress.ip_address(ip_range_str_py.strip())
  *             return [str(single_ip)]
- *     except ValueError:             # <<<<<<<<<<<<<<
- *         return [] # Return empty list on error like invalid IP format
+ *     except ValueError: return []             # <<<<<<<<<<<<<<
  *
+ * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py, double timeout_seconds=1.0):
  */
     __pyx_t_12 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_ValueError);
     if (__pyx_t_12) {
       __Pyx_AddTraceback("scanner._parse_ip_range_py", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_8, &__pyx_t_9) < 0) __PYX_ERR(0, 104, __pyx_L6_except_error)
+      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_8, &__pyx_t_9) < 0) __PYX_ERR(0, 188, __pyx_L6_except_error)
       __Pyx_XGOTREF(__pyx_t_3);
       __Pyx_XGOTREF(__pyx_t_8);
       __Pyx_XGOTREF(__pyx_t_9);
-
-      /* "scanner.pyx":105
- *             return [str(single_ip)]
- *     except ValueError:
- *         return [] # Return empty list on error like invalid IP format             # <<<<<<<<<<<<<<
- *
- * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py):
- */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 105, __pyx_L6_except_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 188, __pyx_L6_except_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_r = __pyx_t_7;
       __pyx_t_7 = 0;
@@ -4258,9 +4781,9 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
     }
     goto __pyx_L6_except_error;
 
-    /* "scanner.pyx":74
- *         return []
- *
+    /* "scanner.pyx":171
+ *     """
+ *     if not isinstance(ip_range_str_py, str): return []
  *     try:             # <<<<<<<<<<<<<<
  *         if '-' in ip_range_str_py:
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)
@@ -4285,9 +4808,9 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
     goto __pyx_L0;
   }
 
-  /* "scanner.pyx":58
+  /* "scanner.pyx":166
+ *     return open_ports
  *
- * # Helper function using standard Python for ipaddress module
  * def _parse_ip_range_py(ip_range_str_py):             # <<<<<<<<<<<<<<
  *     """
  *     (Python, called by Cython) Parses an IP range string into a list of IPs.
@@ -4317,22 +4840,23 @@ static PyObject *__pyx_pf_7scanner_4_parse_ip_range_py(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "scanner.pyx":107
- *         return [] # Return empty list on error like invalid IP format
+/* "scanner.pyx":190
+ *     except ValueError: return []
  *
- * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py):             # <<<<<<<<<<<<<<
+ * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans a range of IP addresses for specified ports.
  */
 
-static PyObject *__pyx_pw_7scanner_7scan_ip_range(PyObject *__pyx_self,
+static PyObject *__pyx_pw_7scanner_9scan_ip_range(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_py, PyObject *__pyx_v_ports_to_scan_py, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_py, PyObject *__pyx_v_ports_to_scan_py, CYTHON_UNUSED int __pyx_skip_dispatch, struct __pyx_opt_args_7scanner_scan_ip_range *__pyx_optional_args) {
+  double __pyx_v_timeout_seconds = ((double)1.0);
   PyObject *__pyx_v_results = 0;
   PyObject *__pyx_v_ips_to_scan_py = 0;
   PyObject *__pyx_v_ip_address_py_loopvar = 0;
@@ -4348,31 +4872,37 @@ static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_p
   int __pyx_t_6;
   int __pyx_t_7;
   PyObject *__pyx_t_8 = NULL;
+  PyObject *__pyx_t_9 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("scan_ip_range", 1);
+  if (__pyx_optional_args) {
+    if (__pyx_optional_args->__pyx_n > 0) {
+      __pyx_v_timeout_seconds = __pyx_optional_args->timeout_seconds;
+    }
+  }
 
-  /* "scanner.pyx":120
- *         and values are lists of open ports for that IP.
+  /* "scanner.pyx":202
+ *         A dictionary where keys are IP addresses and values are lists of open ports.
  *     """
  *     cdef dict results = {}             # <<<<<<<<<<<<<<
- *     # Call the Python helper function
  *     cdef list ips_to_scan_py = _parse_ip_range_py(ip_range_str_py)
+ *     cdef str ip_address_py_loopvar
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_results = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "scanner.pyx":122
+  /* "scanner.pyx":203
+ *     """
  *     cdef dict results = {}
- *     # Call the Python helper function
  *     cdef list ips_to_scan_py = _parse_ip_range_py(ip_range_str_py)             # <<<<<<<<<<<<<<
- *     cdef str ip_address_py_loopvar # Explicitly declare type for loop variable
+ *     cdef str ip_address_py_loopvar
  *     cdef list open_ports_py
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_parse_ip_range_py); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_parse_ip_range_py); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_4 = 0;
@@ -4392,24 +4922,24 @@ static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_p
     PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_ip_range_str_py};
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 122, __pyx_L1_error)
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 203, __pyx_L1_error)
   __pyx_v_ips_to_scan_py = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "scanner.pyx":126
+  /* "scanner.pyx":207
  *     cdef list open_ports_py
  *
  *     for ip_address_py_loopvar in ips_to_scan_py:             # <<<<<<<<<<<<<<
- *         # Ensure ip_address_py_loopvar is actually a string before encoding
- *         if not isinstance(ip_address_py_loopvar, str):
+ *         if not isinstance(ip_address_py_loopvar, str): continue
+ *         ip_address_bytes = ip_address_py_loopvar.encode('utf-8')
  */
   if (unlikely(__pyx_v_ips_to_scan_py == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 126, __pyx_L1_error)
+    __PYX_ERR(0, 207, __pyx_L1_error)
   }
   __pyx_t_1 = __pyx_v_ips_to_scan_py; __Pyx_INCREF(__pyx_t_1);
   __pyx_t_5 = 0;
@@ -4417,82 +4947,68 @@ static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_p
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
       #if !CYTHON_ASSUME_SAFE_MACROS
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 126, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 207, __pyx_L1_error)
       #endif
       if (__pyx_t_5 >= __pyx_temp) break;
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_2); __pyx_t_5++; if (unlikely((0 < 0))) __PYX_ERR(0, 126, __pyx_L1_error)
+    __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_5); __Pyx_INCREF(__pyx_t_2); __pyx_t_5++; if (unlikely((0 < 0))) __PYX_ERR(0, 207, __pyx_L1_error)
     #else
-    __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_1, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
-    if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("unicode", __pyx_t_2))) __PYX_ERR(0, 126, __pyx_L1_error)
+    if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("unicode", __pyx_t_2))) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_ip_address_py_loopvar, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "scanner.pyx":128
+    /* "scanner.pyx":208
+ *
  *     for ip_address_py_loopvar in ips_to_scan_py:
- *         # Ensure ip_address_py_loopvar is actually a string before encoding
- *         if not isinstance(ip_address_py_loopvar, str):             # <<<<<<<<<<<<<<
- *             # This case should ideally not be reached if _parse_ip_range_py is correct
- *             continue
+ *         if not isinstance(ip_address_py_loopvar, str): continue             # <<<<<<<<<<<<<<
+ *         ip_address_bytes = ip_address_py_loopvar.encode('utf-8')
+ *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py, timeout_seconds) # Pass timeout
  */
     __pyx_t_6 = PyUnicode_Check(__pyx_v_ip_address_py_loopvar);
     __pyx_t_7 = (!__pyx_t_6);
     if (__pyx_t_7) {
-
-      /* "scanner.pyx":130
- *         if not isinstance(ip_address_py_loopvar, str):
- *             # This case should ideally not be reached if _parse_ip_range_py is correct
- *             continue             # <<<<<<<<<<<<<<
- *         ip_address_bytes = ip_address_py_loopvar.encode('utf-8')
- *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py)
- */
       goto __pyx_L3_continue;
-
-      /* "scanner.pyx":128
- *     for ip_address_py_loopvar in ips_to_scan_py:
- *         # Ensure ip_address_py_loopvar is actually a string before encoding
- *         if not isinstance(ip_address_py_loopvar, str):             # <<<<<<<<<<<<<<
- *             # This case should ideally not be reached if _parse_ip_range_py is correct
- *             continue
- */
     }
 
-    /* "scanner.pyx":131
- *             # This case should ideally not be reached if _parse_ip_range_py is correct
- *             continue
+    /* "scanner.pyx":209
+ *     for ip_address_py_loopvar in ips_to_scan_py:
+ *         if not isinstance(ip_address_py_loopvar, str): continue
  *         ip_address_bytes = ip_address_py_loopvar.encode('utf-8')             # <<<<<<<<<<<<<<
- *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py)
+ *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py, timeout_seconds) # Pass timeout
  *         if open_ports_py:
  */
     if (unlikely(__pyx_v_ip_address_py_loopvar == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-      __PYX_ERR(0, 131, __pyx_L1_error)
+      __PYX_ERR(0, 209, __pyx_L1_error)
     }
-    __pyx_t_2 = PyUnicode_AsUTF8String(__pyx_v_ip_address_py_loopvar); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 131, __pyx_L1_error)
+    __pyx_t_2 = PyUnicode_AsUTF8String(__pyx_v_ip_address_py_loopvar); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_ip_address_bytes, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "scanner.pyx":132
- *             continue
+    /* "scanner.pyx":210
+ *         if not isinstance(ip_address_py_loopvar, str): continue
  *         ip_address_bytes = ip_address_py_loopvar.encode('utf-8')
- *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py)             # <<<<<<<<<<<<<<
+ *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py, timeout_seconds) # Pass timeout             # <<<<<<<<<<<<<<
  *         if open_ports_py:
  *             results[ip_address_py_loopvar] = open_ports_py
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_scan_ports_single_ip); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_scan_ports_single_ip); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 210, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = NULL;
+    __pyx_t_8 = PyFloat_FromDouble(__pyx_v_timeout_seconds); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 210, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_9 = NULL;
     __pyx_t_4 = 0;
     #if CYTHON_UNPACK_METHODS
     if (unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_8)) {
+      __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_9)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_8);
+        __Pyx_INCREF(__pyx_t_9);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_3, function);
         __pyx_t_4 = 1;
@@ -4500,20 +5016,21 @@ static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_p
     }
     #endif
     {
-      PyObject *__pyx_callargs[3] = {__pyx_t_8, __pyx_v_ip_address_bytes, __pyx_v_ports_to_scan_py};
-      __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 132, __pyx_L1_error)
+      PyObject *__pyx_callargs[4] = {__pyx_t_9, __pyx_v_ip_address_bytes, __pyx_v_ports_to_scan_py, __pyx_t_8};
+      __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 3+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
-    if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 132, __pyx_L1_error)
+    if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 210, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_open_ports_py, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "scanner.pyx":133
+    /* "scanner.pyx":211
  *         ip_address_bytes = ip_address_py_loopvar.encode('utf-8')
- *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py)
+ *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py, timeout_seconds) # Pass timeout
  *         if open_ports_py:             # <<<<<<<<<<<<<<
  *             results[ip_address_py_loopvar] = open_ports_py
  *     return results
@@ -4521,51 +5038,51 @@ static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_p
     __pyx_t_7 = (__pyx_v_open_ports_py != Py_None)&&(PyList_GET_SIZE(__pyx_v_open_ports_py) != 0);
     if (__pyx_t_7) {
 
-      /* "scanner.pyx":134
- *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py)
+      /* "scanner.pyx":212
+ *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py, timeout_seconds) # Pass timeout
  *         if open_ports_py:
  *             results[ip_address_py_loopvar] = open_ports_py             # <<<<<<<<<<<<<<
  *     return results
  *
  */
-      if (unlikely((PyDict_SetItem(__pyx_v_results, __pyx_v_ip_address_py_loopvar, __pyx_v_open_ports_py) < 0))) __PYX_ERR(0, 134, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_results, __pyx_v_ip_address_py_loopvar, __pyx_v_open_ports_py) < 0))) __PYX_ERR(0, 212, __pyx_L1_error)
 
-      /* "scanner.pyx":133
+      /* "scanner.pyx":211
  *         ip_address_bytes = ip_address_py_loopvar.encode('utf-8')
- *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py)
+ *         open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py, timeout_seconds) # Pass timeout
  *         if open_ports_py:             # <<<<<<<<<<<<<<
  *             results[ip_address_py_loopvar] = open_ports_py
  *     return results
  */
     }
 
-    /* "scanner.pyx":126
+    /* "scanner.pyx":207
  *     cdef list open_ports_py
  *
  *     for ip_address_py_loopvar in ips_to_scan_py:             # <<<<<<<<<<<<<<
- *         # Ensure ip_address_py_loopvar is actually a string before encoding
- *         if not isinstance(ip_address_py_loopvar, str):
+ *         if not isinstance(ip_address_py_loopvar, str): continue
+ *         ip_address_bytes = ip_address_py_loopvar.encode('utf-8')
  */
     __pyx_L3_continue:;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "scanner.pyx":135
+  /* "scanner.pyx":213
  *         if open_ports_py:
  *             results[ip_address_py_loopvar] = open_ports_py
  *     return results             # <<<<<<<<<<<<<<
  *
- * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py):
+ * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py, double timeout_seconds=1.0):
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_results);
   __pyx_r = __pyx_v_results;
   goto __pyx_L0;
 
-  /* "scanner.pyx":107
- *         return [] # Return empty list on error like invalid IP format
+  /* "scanner.pyx":190
+ *     except ValueError: return []
  *
- * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py):             # <<<<<<<<<<<<<<
+ * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans a range of IP addresses for specified ports.
  */
@@ -4576,6 +5093,7 @@ static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_p
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_9);
   __Pyx_AddTraceback("scanner.scan_ip_range", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -4590,16 +5108,16 @@ static PyObject *__pyx_f_7scanner_scan_ip_range(PyObject *__pyx_v_ip_range_str_p
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7scanner_7scan_ip_range(PyObject *__pyx_self,
+static PyObject *__pyx_pw_7scanner_9scan_ip_range(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_7scanner_6scan_ip_range, "\n    (Cython) Scans a range of IP addresses for specified ports.\n\n    Args:\n        ip_range_str_py: The IP range string (e.g., \"192.168.1.1-192.168.1.10\").\n                         Can also be a single IP address string.\n        ports_to_scan_py: A Python list of port numbers to scan.\n\n    Returns:\n        A Python dictionary where keys are IP addresses from the range\n        and values are lists of open ports for that IP.\n    ");
-static PyMethodDef __pyx_mdef_7scanner_7scan_ip_range = {"scan_ip_range", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_7scan_ip_range, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_6scan_ip_range};
-static PyObject *__pyx_pw_7scanner_7scan_ip_range(PyObject *__pyx_self,
+PyDoc_STRVAR(__pyx_doc_7scanner_8scan_ip_range, "\n    (Cython) Scans a range of IP addresses for specified ports.\n\n    Args:\n        ip_range_str_py: The IP range string (e.g., \"192.168.1.1-192.168.1.10\").\n        ports_to_scan_py: A list of port numbers to scan.\n        timeout_seconds: Connection timeout for each port. Default is 1.0.\n\n    Returns:\n        A dictionary where keys are IP addresses and values are lists of open ports.\n    ");
+static PyMethodDef __pyx_mdef_7scanner_9scan_ip_range = {"scan_ip_range", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_9scan_ip_range, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_8scan_ip_range};
+static PyObject *__pyx_pw_7scanner_9scan_ip_range(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -4608,11 +5126,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 ) {
   PyObject *__pyx_v_ip_range_str_py = 0;
   PyObject *__pyx_v_ports_to_scan_py = 0;
+  double __pyx_v_timeout_seconds;
   #if !CYTHON_METH_FASTCALL
   CYTHON_UNUSED Py_ssize_t __pyx_nargs;
   #endif
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
+  PyObject* values[3] = {0,0,0};
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -4628,10 +5147,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_ip_range_str_py,&__pyx_n_s_ports_to_scan_py,0};
+    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_ip_range_str_py,&__pyx_n_s_ports_to_scan_py,&__pyx_n_s_timeout_seconds,0};
     if (__pyx_kwds) {
       Py_ssize_t kw_args;
       switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
         case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
@@ -4646,7 +5167,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 107, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 190, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -4654,27 +5175,43 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 107, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 190, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("scan_ip_range", 1, 2, 2, 1); __PYX_ERR(0, 107, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("scan_ip_range", 0, 2, 3, 1); __PYX_ERR(0, 190, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_timeout_seconds);
+          if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 190, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "scan_ip_range") < 0)) __PYX_ERR(0, 107, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "scan_ip_range") < 0)) __PYX_ERR(0, 190, __pyx_L3_error)
       }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
     } else {
-      values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
-      values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+      switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+        values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
     }
     __pyx_v_ip_range_str_py = ((PyObject*)values[0]);
     __pyx_v_ports_to_scan_py = ((PyObject*)values[1]);
+    if (values[2]) {
+      __pyx_v_timeout_seconds = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_timeout_seconds == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 190, __pyx_L3_error)
+    } else {
+      __pyx_v_timeout_seconds = ((double)1.0);
+    }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("scan_ip_range", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 107, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("scan_ip_range", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 190, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4688,9 +5225,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ip_range_str_py), (&PyUnicode_Type), 1, "ip_range_str_py", 1))) __PYX_ERR(0, 107, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ports_to_scan_py), (&PyList_Type), 1, "ports_to_scan_py", 1))) __PYX_ERR(0, 107, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7scanner_6scan_ip_range(__pyx_self, __pyx_v_ip_range_str_py, __pyx_v_ports_to_scan_py);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ip_range_str_py), (&PyUnicode_Type), 1, "ip_range_str_py", 1))) __PYX_ERR(0, 190, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ports_to_scan_py), (&PyList_Type), 1, "ports_to_scan_py", 1))) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7scanner_8scan_ip_range(__pyx_self, __pyx_v_ip_range_str_py, __pyx_v_ports_to_scan_py, __pyx_v_timeout_seconds);
 
   /* function exit code */
   goto __pyx_L0;
@@ -4707,16 +5244,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7scanner_6scan_ip_range(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_range_str_py, PyObject *__pyx_v_ports_to_scan_py) {
+static PyObject *__pyx_pf_7scanner_8scan_ip_range(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_range_str_py, PyObject *__pyx_v_ports_to_scan_py, double __pyx_v_timeout_seconds) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
+  struct __pyx_opt_args_7scanner_scan_ip_range __pyx_t_2;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("scan_ip_range", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7scanner_scan_ip_range(__pyx_v_ip_range_str_py, __pyx_v_ports_to_scan_py, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_2.__pyx_n = 1;
+  __pyx_t_2.timeout_seconds = __pyx_v_timeout_seconds;
+  __pyx_t_1 = __pyx_f_7scanner_scan_ip_range(__pyx_v_ip_range_str_py, __pyx_v_ports_to_scan_py, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4733,22 +5273,23 @@ static PyObject *__pyx_pf_7scanner_6scan_ip_range(CYTHON_UNUSED PyObject *__pyx_
   return __pyx_r;
 }
 
-/* "scanner.pyx":137
+/* "scanner.pyx":215
  *     return results
  *
- * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py):             # <<<<<<<<<<<<<<
+ * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans a list of IP addresses and/or IP ranges for specified ports.
  */
 
-static PyObject *__pyx_pw_7scanner_9scan_ip_list(PyObject *__pyx_self,
+static PyObject *__pyx_pw_7scanner_11scan_ip_list(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyObject *__pyx_f_7scanner_scan_ip_list(PyObject *__pyx_v_ip_list_py, PyObject *__pyx_v_ports_to_scan_py, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_f_7scanner_scan_ip_list(PyObject *__pyx_v_ip_list_py, PyObject *__pyx_v_ports_to_scan_py, CYTHON_UNUSED int __pyx_skip_dispatch, struct __pyx_opt_args_7scanner_scan_ip_list *__pyx_optional_args) {
+  double __pyx_v_timeout_seconds = ((double)1.0);
   PyObject *__pyx_v_aggregated_results = 0;
   PyObject *__pyx_v_ip_definition_str_py_loopvar = 0;
   PyObject *__pyx_v_range_results_py = 0;
@@ -4759,33 +5300,39 @@ static PyObject *__pyx_f_7scanner_scan_ip_list(PyObject *__pyx_v_ip_list_py, PyO
   PyObject *__pyx_t_3 = NULL;
   int __pyx_t_4;
   int __pyx_t_5;
+  struct __pyx_opt_args_7scanner_scan_ip_range __pyx_t_6;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("scan_ip_list", 1);
+  if (__pyx_optional_args) {
+    if (__pyx_optional_args->__pyx_n > 0) {
+      __pyx_v_timeout_seconds = __pyx_optional_args->timeout_seconds;
+    }
+  }
 
-  /* "scanner.pyx":150
- *         and values are lists of open ports for that IP.
+  /* "scanner.pyx":227
+ *         A dictionary where keys are IP addresses and values are lists of open ports.
  *     """
  *     cdef dict aggregated_results = {}             # <<<<<<<<<<<<<<
- *     cdef str ip_definition_str_py_loopvar # Explicitly declare type
+ *     cdef str ip_definition_str_py_loopvar
  *     cdef dict range_results_py
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_aggregated_results = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "scanner.pyx":154
+  /* "scanner.pyx":231
  *     cdef dict range_results_py
  *
  *     for ip_definition_str_py_loopvar in ip_list_py:             # <<<<<<<<<<<<<<
- *         if not isinstance(ip_definition_str_py_loopvar, str):
- *             # Skip non-string items or handle error
+ *         if not isinstance(ip_definition_str_py_loopvar, str): continue
+ *         range_results_py = scan_ip_range(ip_definition_str_py_loopvar, ports_to_scan_py, timeout_seconds) # Pass timeout
  */
   if (unlikely(__pyx_v_ip_list_py == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 154, __pyx_L1_error)
+    __PYX_ERR(0, 231, __pyx_L1_error)
   }
   __pyx_t_1 = __pyx_v_ip_list_py; __Pyx_INCREF(__pyx_t_1);
   __pyx_t_2 = 0;
@@ -4793,84 +5340,70 @@ static PyObject *__pyx_f_7scanner_scan_ip_list(PyObject *__pyx_v_ip_list_py, PyO
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
       #if !CYTHON_ASSUME_SAFE_MACROS
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 154, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 231, __pyx_L1_error)
       #endif
       if (__pyx_t_2 >= __pyx_temp) break;
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely((0 < 0))) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely((0 < 0))) __PYX_ERR(0, 231, __pyx_L1_error)
     #else
-    __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 231, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
-    if (!(likely(PyUnicode_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("unicode", __pyx_t_3))) __PYX_ERR(0, 154, __pyx_L1_error)
+    if (!(likely(PyUnicode_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("unicode", __pyx_t_3))) __PYX_ERR(0, 231, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_ip_definition_str_py_loopvar, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "scanner.pyx":155
+    /* "scanner.pyx":232
  *
  *     for ip_definition_str_py_loopvar in ip_list_py:
- *         if not isinstance(ip_definition_str_py_loopvar, str):             # <<<<<<<<<<<<<<
- *             # Skip non-string items or handle error
- *             continue
+ *         if not isinstance(ip_definition_str_py_loopvar, str): continue             # <<<<<<<<<<<<<<
+ *         range_results_py = scan_ip_range(ip_definition_str_py_loopvar, ports_to_scan_py, timeout_seconds) # Pass timeout
+ *         aggregated_results.update(range_results_py)
  */
     __pyx_t_4 = PyUnicode_Check(__pyx_v_ip_definition_str_py_loopvar);
     __pyx_t_5 = (!__pyx_t_4);
     if (__pyx_t_5) {
-
-      /* "scanner.pyx":157
- *         if not isinstance(ip_definition_str_py_loopvar, str):
- *             # Skip non-string items or handle error
- *             continue             # <<<<<<<<<<<<<<
- *         range_results_py = scan_ip_range(ip_definition_str_py_loopvar, ports_to_scan_py)
- *         # Update preserves existing entries if new dict has same keys,
- */
       goto __pyx_L3_continue;
-
-      /* "scanner.pyx":155
- *
- *     for ip_definition_str_py_loopvar in ip_list_py:
- *         if not isinstance(ip_definition_str_py_loopvar, str):             # <<<<<<<<<<<<<<
- *             # Skip non-string items or handle error
- *             continue
- */
     }
 
-    /* "scanner.pyx":158
- *             # Skip non-string items or handle error
- *             continue
- *         range_results_py = scan_ip_range(ip_definition_str_py_loopvar, ports_to_scan_py)             # <<<<<<<<<<<<<<
- *         # Update preserves existing entries if new dict has same keys,
- *         # which is fine here as IPs from one range call won't overlap with another
+    /* "scanner.pyx":233
+ *     for ip_definition_str_py_loopvar in ip_list_py:
+ *         if not isinstance(ip_definition_str_py_loopvar, str): continue
+ *         range_results_py = scan_ip_range(ip_definition_str_py_loopvar, ports_to_scan_py, timeout_seconds) # Pass timeout             # <<<<<<<<<<<<<<
+ *         aggregated_results.update(range_results_py)
+ *
  */
-    __pyx_t_3 = __pyx_f_7scanner_scan_ip_range(__pyx_v_ip_definition_str_py_loopvar, __pyx_v_ports_to_scan_py, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_6.__pyx_n = 1;
+    __pyx_t_6.timeout_seconds = __pyx_v_timeout_seconds;
+    __pyx_t_3 = __pyx_f_7scanner_scan_ip_range(__pyx_v_ip_definition_str_py_loopvar, __pyx_v_ports_to_scan_py, 0, &__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 233, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_XDECREF_SET(__pyx_v_range_results_py, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "scanner.pyx":162
- *         # which is fine here as IPs from one range call won't overlap with another
- *         # from a different call to scan_ip_range.
+    /* "scanner.pyx":234
+ *         if not isinstance(ip_definition_str_py_loopvar, str): continue
+ *         range_results_py = scan_ip_range(ip_definition_str_py_loopvar, ports_to_scan_py, timeout_seconds) # Pass timeout
  *         aggregated_results.update(range_results_py)             # <<<<<<<<<<<<<<
  *
  *     return aggregated_results
  */
-    __pyx_t_3 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyDict_Type_update, __pyx_v_aggregated_results, __pyx_v_range_results_py); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyDict_Type_update, __pyx_v_aggregated_results, __pyx_v_range_results_py); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "scanner.pyx":154
+    /* "scanner.pyx":231
  *     cdef dict range_results_py
  *
  *     for ip_definition_str_py_loopvar in ip_list_py:             # <<<<<<<<<<<<<<
- *         if not isinstance(ip_definition_str_py_loopvar, str):
- *             # Skip non-string items or handle error
+ *         if not isinstance(ip_definition_str_py_loopvar, str): continue
+ *         range_results_py = scan_ip_range(ip_definition_str_py_loopvar, ports_to_scan_py, timeout_seconds) # Pass timeout
  */
     __pyx_L3_continue:;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "scanner.pyx":164
+  /* "scanner.pyx":236
  *         aggregated_results.update(range_results_py)
  *
  *     return aggregated_results             # <<<<<<<<<<<<<<
@@ -4880,10 +5413,10 @@ static PyObject *__pyx_f_7scanner_scan_ip_list(PyObject *__pyx_v_ip_list_py, PyO
   __pyx_r = __pyx_v_aggregated_results;
   goto __pyx_L0;
 
-  /* "scanner.pyx":137
+  /* "scanner.pyx":215
  *     return results
  *
- * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py):             # <<<<<<<<<<<<<<
+ * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans a list of IP addresses and/or IP ranges for specified ports.
  */
@@ -4904,16 +5437,16 @@ static PyObject *__pyx_f_7scanner_scan_ip_list(PyObject *__pyx_v_ip_list_py, PyO
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7scanner_9scan_ip_list(PyObject *__pyx_self,
+static PyObject *__pyx_pw_7scanner_11scan_ip_list(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_7scanner_8scan_ip_list, "\n    (Cython) Scans a list of IP addresses and/or IP ranges for specified ports.\n\n    Args:\n        ip_list_py: A Python list of IP/IP range strings.\n                    Each string can be a single IP or a hyphenated range.\n        ports_to_scan_py: A Python list of port numbers to scan.\n\n    Returns:\n        A Python dictionary where keys are IP addresses from the expanded list\n        and values are lists of open ports for that IP.\n    ");
-static PyMethodDef __pyx_mdef_7scanner_9scan_ip_list = {"scan_ip_list", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_9scan_ip_list, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_8scan_ip_list};
-static PyObject *__pyx_pw_7scanner_9scan_ip_list(PyObject *__pyx_self,
+PyDoc_STRVAR(__pyx_doc_7scanner_10scan_ip_list, "\n    (Cython) Scans a list of IP addresses and/or IP ranges for specified ports.\n\n    Args:\n        ip_list_py: A list of IP/IP range strings.\n        ports_to_scan_py: A list of port numbers to scan.\n        timeout_seconds: Connection timeout for each port. Default is 1.0.\n\n    Returns:\n        A dictionary where keys are IP addresses and values are lists of open ports.\n    ");
+static PyMethodDef __pyx_mdef_7scanner_11scan_ip_list = {"scan_ip_list", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7scanner_11scan_ip_list, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7scanner_10scan_ip_list};
+static PyObject *__pyx_pw_7scanner_11scan_ip_list(PyObject *__pyx_self,
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -4922,11 +5455,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 ) {
   PyObject *__pyx_v_ip_list_py = 0;
   PyObject *__pyx_v_ports_to_scan_py = 0;
+  double __pyx_v_timeout_seconds;
   #if !CYTHON_METH_FASTCALL
   CYTHON_UNUSED Py_ssize_t __pyx_nargs;
   #endif
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
+  PyObject* values[3] = {0,0,0};
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -4942,10 +5476,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_ip_list_py,&__pyx_n_s_ports_to_scan_py,0};
+    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_ip_list_py,&__pyx_n_s_ports_to_scan_py,&__pyx_n_s_timeout_seconds,0};
     if (__pyx_kwds) {
       Py_ssize_t kw_args;
       switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
         case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
@@ -4960,7 +5496,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 137, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -4968,27 +5504,43 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 137, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("scan_ip_list", 1, 2, 2, 1); __PYX_ERR(0, 137, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("scan_ip_list", 0, 2, 3, 1); __PYX_ERR(0, 215, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_timeout_seconds);
+          if (value) { values[2] = __Pyx_Arg_NewRef_FASTCALL(value); kw_args--; }
+          else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "scan_ip_list") < 0)) __PYX_ERR(0, 137, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "scan_ip_list") < 0)) __PYX_ERR(0, 215, __pyx_L3_error)
       }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
     } else {
-      values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
-      values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+      switch (__pyx_nargs) {
+        case  3: values[2] = __Pyx_Arg_FASTCALL(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+        values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
     }
     __pyx_v_ip_list_py = ((PyObject*)values[0]);
     __pyx_v_ports_to_scan_py = ((PyObject*)values[1]);
+    if (values[2]) {
+      __pyx_v_timeout_seconds = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_timeout_seconds == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L3_error)
+    } else {
+      __pyx_v_timeout_seconds = ((double)1.0);
+    }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("scan_ip_list", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 137, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("scan_ip_list", 0, 2, 3, __pyx_nargs); __PYX_ERR(0, 215, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5002,9 +5554,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ip_list_py), (&PyList_Type), 1, "ip_list_py", 1))) __PYX_ERR(0, 137, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ports_to_scan_py), (&PyList_Type), 1, "ports_to_scan_py", 1))) __PYX_ERR(0, 137, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7scanner_8scan_ip_list(__pyx_self, __pyx_v_ip_list_py, __pyx_v_ports_to_scan_py);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ip_list_py), (&PyList_Type), 1, "ip_list_py", 1))) __PYX_ERR(0, 215, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ports_to_scan_py), (&PyList_Type), 1, "ports_to_scan_py", 1))) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7scanner_10scan_ip_list(__pyx_self, __pyx_v_ip_list_py, __pyx_v_ports_to_scan_py, __pyx_v_timeout_seconds);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5021,16 +5573,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7scanner_8scan_ip_list(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_list_py, PyObject *__pyx_v_ports_to_scan_py) {
+static PyObject *__pyx_pf_7scanner_10scan_ip_list(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_ip_list_py, PyObject *__pyx_v_ports_to_scan_py, double __pyx_v_timeout_seconds) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
+  struct __pyx_opt_args_7scanner_scan_ip_list __pyx_t_2;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("scan_ip_list", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7scanner_scan_ip_list(__pyx_v_ip_list_py, __pyx_v_ports_to_scan_py, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_2.__pyx_n = 1;
+  __pyx_t_2.timeout_seconds = __pyx_v_timeout_seconds;
+  __pyx_t_1 = __pyx_f_7scanner_scan_ip_list(__pyx_v_ip_list_py, __pyx_v_ports_to_scan_py, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5064,21 +5619,19 @@ static PyMethodDef __pyx_methods[] = {
 static int __Pyx_CreateStringTabAndInitStrings(void) {
   __Pyx_StringTabEntry __pyx_string_tab[] = {
     {&__pyx_kp_u_, __pyx_k_, sizeof(__pyx_k_), 0, 1, 0, 0},
-    {&__pyx_n_s_AF_INET, __pyx_k_AF_INET, sizeof(__pyx_k_AF_INET), 0, 0, 1, 1},
-    {&__pyx_n_s_SOCK_STREAM, __pyx_k_SOCK_STREAM, sizeof(__pyx_k_SOCK_STREAM), 0, 0, 1, 1},
     {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
-    {&__pyx_n_s__14, __pyx_k__14, sizeof(__pyx_k__14), 0, 0, 1, 1},
+    {&__pyx_n_s__18, __pyx_k__18, sizeof(__pyx_k__18), 0, 0, 1, 1},
     {&__pyx_n_s__3, __pyx_k__3, sizeof(__pyx_k__3), 0, 0, 1, 1},
-    {&__pyx_n_s_addr_tuple, __pyx_k_addr_tuple, sizeof(__pyx_k_addr_tuple), 0, 0, 1, 1},
     {&__pyx_n_s_asyncio_coroutines, __pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 0, 1, 1},
+    {&__pyx_n_s_c_scan_port, __pyx_k_c_scan_port, sizeof(__pyx_k_c_scan_port), 0, 0, 1, 1},
     {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
-    {&__pyx_n_s_close, __pyx_k_close, sizeof(__pyx_k_close), 0, 0, 1, 1},
-    {&__pyx_n_s_connect_ex, __pyx_k_connect_ex, sizeof(__pyx_k_connect_ex), 0, 0, 1, 1},
     {&__pyx_n_s_current_ip_int, __pyx_k_current_ip_int, sizeof(__pyx_k_current_ip_int), 0, 0, 1, 1},
     {&__pyx_n_s_end_ip, __pyx_k_end_ip, sizeof(__pyx_k_end_ip), 0, 0, 1, 1},
     {&__pyx_n_s_end_ip_int, __pyx_k_end_ip_int, sizeof(__pyx_k_end_ip_int), 0, 0, 1, 1},
     {&__pyx_n_s_end_ip_str, __pyx_k_end_ip_str, sizeof(__pyx_k_end_ip_str), 0, 0, 1, 1},
     {&__pyx_n_s_host, __pyx_k_host, sizeof(__pyx_k_host), 0, 0, 1, 1},
+    {&__pyx_n_s_host_c_str, __pyx_k_host_c_str, sizeof(__pyx_k_host_c_str), 0, 0, 1, 1},
+    {&__pyx_n_s_host_ip, __pyx_k_host_ip, sizeof(__pyx_k_host_ip), 0, 0, 1, 1},
     {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
     {&__pyx_n_s_initializing, __pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 0, 1, 1},
     {&__pyx_n_s_ip_address, __pyx_k_ip_address, sizeof(__pyx_k_ip_address), 0, 0, 1, 1},
@@ -5096,24 +5649,21 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_ports_to_scan, __pyx_k_ports_to_scan, sizeof(__pyx_k_ports_to_scan), 0, 0, 1, 1},
     {&__pyx_n_s_ports_to_scan_py, __pyx_k_ports_to_scan_py, sizeof(__pyx_k_ports_to_scan_py), 0, 0, 1, 1},
     {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
-    {&__pyx_n_s_result, __pyx_k_result, sizeof(__pyx_k_result), 0, 0, 1, 1},
     {&__pyx_n_s_result_ips, __pyx_k_result_ips, sizeof(__pyx_k_result_ips), 0, 0, 1, 1},
-    {&__pyx_n_s_s, __pyx_k_s, sizeof(__pyx_k_s), 0, 0, 1, 1},
     {&__pyx_n_s_scan_ip_list, __pyx_k_scan_ip_list, sizeof(__pyx_k_scan_ip_list), 0, 0, 1, 1},
     {&__pyx_n_s_scan_ip_range, __pyx_k_scan_ip_range, sizeof(__pyx_k_scan_ip_range), 0, 0, 1, 1},
     {&__pyx_n_s_scan_port, __pyx_k_scan_port, sizeof(__pyx_k_scan_port), 0, 0, 1, 1},
     {&__pyx_n_s_scan_ports_single_ip, __pyx_k_scan_ports_single_ip, sizeof(__pyx_k_scan_ports_single_ip), 0, 0, 1, 1},
     {&__pyx_n_s_scanner, __pyx_k_scanner, sizeof(__pyx_k_scanner), 0, 0, 1, 1},
     {&__pyx_kp_s_scanner_pyx, __pyx_k_scanner_pyx, sizeof(__pyx_k_scanner_pyx), 0, 0, 1, 0},
-    {&__pyx_n_s_settimeout, __pyx_k_settimeout, sizeof(__pyx_k_settimeout), 0, 0, 1, 1},
     {&__pyx_n_s_single_ip, __pyx_k_single_ip, sizeof(__pyx_k_single_ip), 0, 0, 1, 1},
-    {&__pyx_n_s_socket, __pyx_k_socket, sizeof(__pyx_k_socket), 0, 0, 1, 1},
     {&__pyx_n_s_spec, __pyx_k_spec, sizeof(__pyx_k_spec), 0, 0, 1, 1},
     {&__pyx_n_s_split, __pyx_k_split, sizeof(__pyx_k_split), 0, 0, 1, 1},
     {&__pyx_n_s_start_ip, __pyx_k_start_ip, sizeof(__pyx_k_start_ip), 0, 0, 1, 1},
     {&__pyx_n_s_start_ip_str, __pyx_k_start_ip_str, sizeof(__pyx_k_start_ip_str), 0, 0, 1, 1},
     {&__pyx_n_s_strip, __pyx_k_strip, sizeof(__pyx_k_strip), 0, 0, 1, 1},
     {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
+    {&__pyx_n_s_timeout_seconds, __pyx_k_timeout_seconds, sizeof(__pyx_k_timeout_seconds), 0, 0, 1, 1},
     {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
     {&__pyx_n_s_version, __pyx_k_version, sizeof(__pyx_k_version), 0, 0, 1, 1},
     {0, 0, 0, 0, 0, 0, 0}
@@ -5122,8 +5672,8 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
 }
 /* #### Code section: cached_builtins ### */
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 97, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 188, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -5134,76 +5684,94 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "scanner.pyx":76
+  /* "scanner.pyx":173
  *     try:
  *         if '-' in ip_range_str_py:
  *             start_ip_str, end_ip_str = ip_range_str_py.split('-', 1)             # <<<<<<<<<<<<<<
  *             start_ip = ipaddress.ip_address(start_ip_str.strip())
  *             end_ip = ipaddress.ip_address(end_ip_str.strip())
  */
-  __pyx_tuple__2 = PyTuple_Pack(2, __pyx_kp_u_, __pyx_int_1); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(2, __pyx_kp_u_, __pyx_int_1); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "scanner.pyx":8
+  /* "scanner.pyx":66
+ *     int C_EINPROGRESS "EINPROGRESS"
  *
- * # Ensure scan_port and scan_ports_single_ip are present
- * def scan_port(bytes host, int port):             # <<<<<<<<<<<<<<
- *     """
- *     (Cython) Scans a single port on a single host.
+ * cpdef bint c_scan_port(const char* host_ip, uint16_t port_num, double timeout_seconds) except -1:             # <<<<<<<<<<<<<<
+ *     cdef int sock_fd = -1
+ *     cdef c_sockaddr_in serv_addr
  */
-  __pyx_tuple__4 = PyTuple_Pack(5, __pyx_n_s_host, __pyx_n_s_port, __pyx_n_s_s, __pyx_n_s_addr_tuple, __pyx_n_s_result); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(3, __pyx_n_s_host_ip, __pyx_n_s_port_num, __pyx_n_s_timeout_seconds); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
-  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_scan_port, 8, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_c_scan_port, 66, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 66, __pyx_L1_error)
 
-  /* "scanner.pyx":37
- *         return False
+  /* "scanner.pyx":130
+ *     return is_open
  *
- * def scan_ports_single_ip(bytes host, list ports_to_scan):             # <<<<<<<<<<<<<<
+ * def scan_port(bytes host, int port, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
+ *     """
+ *     (Cython Python-Wrapper) Scans a single port on a single host using c_scan_port.
+ */
+  __pyx_tuple__6 = PyTuple_Pack(4, __pyx_n_s_host, __pyx_n_s_port, __pyx_n_s_timeout_seconds, __pyx_n_s_host_c_str); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_tuple__6);
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_scan_port, 130, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 130, __pyx_L1_error)
+
+  /* "scanner.pyx":147
+ *     return c_scan_port(host_c_str, <uint16_t>port, timeout_seconds)
+ *
+ * def scan_ports_single_ip(bytes host, list ports_to_scan, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans multiple ports on a single host.
  */
-  __pyx_tuple__6 = PyTuple_Pack(4, __pyx_n_s_host, __pyx_n_s_ports_to_scan, __pyx_n_s_open_ports, __pyx_n_s_port_num); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 37, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__6);
-  __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_scan_ports_single_ip, 37, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(5, __pyx_n_s_host, __pyx_n_s_ports_to_scan, __pyx_n_s_timeout_seconds, __pyx_n_s_open_ports, __pyx_n_s_port_num); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__8);
+  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_scan_ports_single_ip, 147, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 147, __pyx_L1_error)
 
-  /* "scanner.pyx":58
+  /* "scanner.pyx":166
+ *     return open_ports
  *
- * # Helper function using standard Python for ipaddress module
  * def _parse_ip_range_py(ip_range_str_py):             # <<<<<<<<<<<<<<
  *     """
  *     (Python, called by Cython) Parses an IP range string into a list of IPs.
  */
-  __pyx_tuple__8 = PyTuple_Pack(10, __pyx_n_s_ip_range_str_py, __pyx_n_s_start_ip_str, __pyx_n_s_end_ip_str, __pyx_n_s_start_ip, __pyx_n_s_end_ip, __pyx_n_s_result_ips, __pyx_n_s_current_ip_int, __pyx_n_s_end_ip_int, __pyx_n_s_ip_int_val, __pyx_n_s_single_ip); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_parse_ip_range_py, 58, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(10, __pyx_n_s_ip_range_str_py, __pyx_n_s_start_ip_str, __pyx_n_s_end_ip_str, __pyx_n_s_start_ip, __pyx_n_s_end_ip, __pyx_n_s_result_ips, __pyx_n_s_current_ip_int, __pyx_n_s_end_ip_int, __pyx_n_s_ip_int_val, __pyx_n_s_single_ip); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_parse_ip_range_py, 166, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 166, __pyx_L1_error)
 
-  /* "scanner.pyx":107
- *         return [] # Return empty list on error like invalid IP format
+  /* "scanner.pyx":190
+ *     except ValueError: return []
  *
- * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py):             # <<<<<<<<<<<<<<
+ * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans a range of IP addresses for specified ports.
  */
-  __pyx_tuple__10 = PyTuple_Pack(2, __pyx_n_s_ip_range_str_py, __pyx_n_s_ports_to_scan_py); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__10);
-  __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_scan_ip_range, 107, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(3, __pyx_n_s_ip_range_str_py, __pyx_n_s_ports_to_scan_py, __pyx_n_s_timeout_seconds); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__12);
+  __Pyx_GIVEREF(__pyx_tuple__12);
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_scan_ip_range, 190, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_float_1_0); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__14);
+  __Pyx_GIVEREF(__pyx_tuple__14);
 
-  /* "scanner.pyx":137
+  /* "scanner.pyx":215
  *     return results
  *
- * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py):             # <<<<<<<<<<<<<<
+ * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans a list of IP addresses and/or IP ranges for specified ports.
  */
-  __pyx_tuple__12 = PyTuple_Pack(2, __pyx_n_s_ip_list_py, __pyx_n_s_ports_to_scan_py); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 137, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__12);
-  __Pyx_GIVEREF(__pyx_tuple__12);
-  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_scan_ip_list, 137, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_tuple__15 = PyTuple_Pack(3, __pyx_n_s_ip_list_py, __pyx_n_s_ports_to_scan_py, __pyx_n_s_timeout_seconds); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__15);
+  __Pyx_GIVEREF(__pyx_tuple__15);
+  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_scanner_pyx, __pyx_n_s_scan_ip_list, 215, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_float_1_0); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -5217,10 +5785,8 @@ static CYTHON_SMALL_CODE int __Pyx_InitConstants(void) {
   __pyx_umethod_PyDict_Type_update.method_name = &__pyx_n_s_update;
   if (__Pyx_CreateStringTabAndInitStrings() < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   __pyx_float_1_0 = PyFloat_FromDouble(1.0); if (unlikely(!__pyx_float_1_0)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_4096 = PyInt_FromLong(4096); if (unlikely(!__pyx_int_4096)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __pyx_int_neg_1 = PyInt_FromLong(-1); if (unlikely(!__pyx_int_neg_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -5459,6 +6025,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_scanner(PyObject *__pyx_pyinit_mod
   #endif
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -5574,94 +6141,114 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "scanner.pyx":4
+  /* "scanner.pyx":6
+ * # cython: wraparound=False
  *
- * # cimport socket # This was from the prompt, but standard 'import socket' is used below
- * import socket # Standard Python import for socket object usage             # <<<<<<<<<<<<<<
- * import ipaddress # Standard Python import for IP address manipulation
+ * import ipaddress # Keep for _parse_ip_range_py             # <<<<<<<<<<<<<<
  *
+ * # C standard library imports
  */
-  __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_n_s_socket, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_n_s_ipaddress, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_socket, __pyx_t_2) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ipaddress, __pyx_t_2) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "scanner.pyx":5
- * # cimport socket # This was from the prompt, but standard 'import socket' is used below
- * import socket # Standard Python import for socket object usage
- * import ipaddress # Standard Python import for IP address manipulation             # <<<<<<<<<<<<<<
+  /* "scanner.pyx":66
+ *     int C_EINPROGRESS "EINPROGRESS"
  *
- * # Ensure scan_port and scan_ports_single_ip are present
+ * cpdef bint c_scan_port(const char* host_ip, uint16_t port_num, double timeout_seconds) except -1:             # <<<<<<<<<<<<<<
+ *     cdef int sock_fd = -1
+ *     cdef c_sockaddr_in serv_addr
  */
-  __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_n_s_ipaddress, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_1c_scan_port, 0, __pyx_n_s_c_scan_port, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__5)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ipaddress, __pyx_t_2) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_c_scan_port, __pyx_t_2) < 0) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "scanner.pyx":8
+  /* "scanner.pyx":130
+ *     return is_open
  *
- * # Ensure scan_port and scan_ports_single_ip are present
- * def scan_port(bytes host, int port):             # <<<<<<<<<<<<<<
+ * def scan_port(bytes host, int port, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
- *     (Cython) Scans a single port on a single host.
+ *     (Cython Python-Wrapper) Scans a single port on a single host using c_scan_port.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_1scan_port, 0, __pyx_n_s_scan_port, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__5)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(((double)1.0)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scan_port, __pyx_t_2) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_2);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_3scan_port, 0, __pyx_n_s_scan_port, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_t_3);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scan_port, __pyx_t_2) < 0) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "scanner.pyx":37
- *         return False
+  /* "scanner.pyx":147
+ *     return c_scan_port(host_c_str, <uint16_t>port, timeout_seconds)
  *
- * def scan_ports_single_ip(bytes host, list ports_to_scan):             # <<<<<<<<<<<<<<
+ * def scan_ports_single_ip(bytes host, list ports_to_scan, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans multiple ports on a single host.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_3scan_ports_single_ip, 0, __pyx_n_s_scan_ports_single_ip, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(((double)1.0)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scan_ports_single_ip, __pyx_t_2) < 0) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_2);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_5scan_ports_single_ip, 0, __pyx_n_s_scan_ports_single_ip, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_t_3);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scan_ports_single_ip, __pyx_t_2) < 0) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "scanner.pyx":58
+  /* "scanner.pyx":166
+ *     return open_ports
  *
- * # Helper function using standard Python for ipaddress module
  * def _parse_ip_range_py(ip_range_str_py):             # <<<<<<<<<<<<<<
  *     """
  *     (Python, called by Cython) Parses an IP range string into a list of IPs.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_5_parse_ip_range_py, 0, __pyx_n_s_parse_ip_range_py, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_7_parse_ip_range_py, 0, __pyx_n_s_parse_ip_range_py, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_parse_ip_range_py, __pyx_t_2) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_parse_ip_range_py, __pyx_t_2) < 0) __PYX_ERR(0, 166, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "scanner.pyx":107
- *         return [] # Return empty list on error like invalid IP format
+  /* "scanner.pyx":190
+ *     except ValueError: return []
  *
- * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py):             # <<<<<<<<<<<<<<
+ * cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans a range of IP addresses for specified ports.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_7scan_ip_range, 0, __pyx_n_s_scan_ip_range, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_9scan_ip_range, 0, __pyx_n_s_scan_ip_range, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scan_ip_range, __pyx_t_2) < 0) __PYX_ERR(0, 107, __pyx_L1_error)
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__14);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scan_ip_range, __pyx_t_2) < 0) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "scanner.pyx":137
+  /* "scanner.pyx":215
  *     return results
  *
- * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py):             # <<<<<<<<<<<<<<
+ * cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py, double timeout_seconds=1.0):             # <<<<<<<<<<<<<<
  *     """
  *     (Cython) Scans a list of IP addresses and/or IP ranges for specified ports.
  */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_9scan_ip_list, 0, __pyx_n_s_scan_ip_list, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7scanner_11scan_ip_list, 0, __pyx_n_s_scan_ip_list, NULL, __pyx_n_s_scanner, __pyx_d, ((PyObject *)__pyx_codeobj__16)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scan_ip_list, __pyx_t_2) < 0) __PYX_ERR(0, 137, __pyx_L1_error)
+  __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__17);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scan_ip_list, __pyx_t_2) < 0) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "scanner.pyx":1
  * # cython: language_level=3             # <<<<<<<<<<<<<<
- *
- * # cimport socket # This was from the prompt, but standard 'import socket' is used below
+ * # cython: cdivision=True
+ * # cython: boundscheck=False
  */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -5673,6 +6260,7 @@ if (!__Pyx_RefNanny) {
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
   if (__pyx_m) {
     if (__pyx_d && stringtab_initialized) {
       __Pyx_AddTraceback("init scanner", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -6663,336 +7251,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_FastCallDict(PyObject *func, PyObj
     #endif
 }
 
-/* decode_c_bytes */
-static CYTHON_INLINE PyObject* __Pyx_decode_c_bytes(
-         const char* cstring, Py_ssize_t length, Py_ssize_t start, Py_ssize_t stop,
-         const char* encoding, const char* errors,
-         PyObject* (*decode_func)(const char *s, Py_ssize_t size, const char *errors)) {
-    if (unlikely((start < 0) | (stop < 0))) {
-        if (start < 0) {
-            start += length;
-            if (start < 0)
-                start = 0;
-        }
-        if (stop < 0)
-            stop += length;
-    }
-    if (stop > length)
-        stop = length;
-    if (unlikely(stop <= start))
-        return __Pyx_NewRef(__pyx_empty_unicode);
-    length = stop - start;
-    cstring += start;
-    if (decode_func) {
-        return decode_func(cstring, length, errors);
-    } else {
-        return PyUnicode_Decode(cstring, length, encoding, errors);
-    }
-}
-
-/* GetException */
-#if CYTHON_FAST_THREAD_STATE
-static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb)
-#else
-static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb)
-#endif
-{
-    PyObject *local_type = NULL, *local_value, *local_tb = NULL;
-#if CYTHON_FAST_THREAD_STATE
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-  #if PY_VERSION_HEX >= 0x030C00A6
-    local_value = tstate->current_exception;
-    tstate->current_exception = 0;
-    if (likely(local_value)) {
-        local_type = (PyObject*) Py_TYPE(local_value);
-        Py_INCREF(local_type);
-        local_tb = PyException_GetTraceback(local_value);
-    }
-  #else
-    local_type = tstate->curexc_type;
-    local_value = tstate->curexc_value;
-    local_tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
-  #endif
-#else
-    PyErr_Fetch(&local_type, &local_value, &local_tb);
-#endif
-    PyErr_NormalizeException(&local_type, &local_value, &local_tb);
-#if CYTHON_FAST_THREAD_STATE && PY_VERSION_HEX >= 0x030C00A6
-    if (unlikely(tstate->current_exception))
-#elif CYTHON_FAST_THREAD_STATE
-    if (unlikely(tstate->curexc_type))
-#else
-    if (unlikely(PyErr_Occurred()))
-#endif
-        goto bad;
-    #if PY_MAJOR_VERSION >= 3
-    if (local_tb) {
-        if (unlikely(PyException_SetTraceback(local_value, local_tb) < 0))
-            goto bad;
-    }
-    #endif
-    Py_XINCREF(local_tb);
-    Py_XINCREF(local_type);
-    Py_XINCREF(local_value);
-    *type = local_type;
-    *value = local_value;
-    *tb = local_tb;
-#if CYTHON_FAST_THREAD_STATE
-    #if CYTHON_USE_EXC_INFO_STACK
-    {
-        _PyErr_StackItem *exc_info = tstate->exc_info;
-      #if PY_VERSION_HEX >= 0x030B00a4
-        tmp_value = exc_info->exc_value;
-        exc_info->exc_value = local_value;
-        tmp_type = NULL;
-        tmp_tb = NULL;
-        Py_XDECREF(local_type);
-        Py_XDECREF(local_tb);
-      #else
-        tmp_type = exc_info->exc_type;
-        tmp_value = exc_info->exc_value;
-        tmp_tb = exc_info->exc_traceback;
-        exc_info->exc_type = local_type;
-        exc_info->exc_value = local_value;
-        exc_info->exc_traceback = local_tb;
-      #endif
-    }
-    #else
-    tmp_type = tstate->exc_type;
-    tmp_value = tstate->exc_value;
-    tmp_tb = tstate->exc_traceback;
-    tstate->exc_type = local_type;
-    tstate->exc_value = local_value;
-    tstate->exc_traceback = local_tb;
-    #endif
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-#else
-    PyErr_SetExcInfo(local_type, local_value, local_tb);
-#endif
-    return 0;
-bad:
-    *type = 0;
-    *value = 0;
-    *tb = 0;
-    Py_XDECREF(local_type);
-    Py_XDECREF(local_value);
-    Py_XDECREF(local_tb);
-    return -1;
-}
-
-/* SwapException */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx__ExceptionSwap(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-  #if CYTHON_USE_EXC_INFO_STACK && PY_VERSION_HEX >= 0x030B00a4
-    _PyErr_StackItem *exc_info = tstate->exc_info;
-    tmp_value = exc_info->exc_value;
-    exc_info->exc_value = *value;
-    if (tmp_value == NULL || tmp_value == Py_None) {
-        Py_XDECREF(tmp_value);
-        tmp_value = NULL;
-        tmp_type = NULL;
-        tmp_tb = NULL;
-    } else {
-        tmp_type = (PyObject*) Py_TYPE(tmp_value);
-        Py_INCREF(tmp_type);
-        #if CYTHON_COMPILING_IN_CPYTHON
-        tmp_tb = ((PyBaseExceptionObject*) tmp_value)->traceback;
-        Py_XINCREF(tmp_tb);
-        #else
-        tmp_tb = PyException_GetTraceback(tmp_value);
-        #endif
-    }
-  #elif CYTHON_USE_EXC_INFO_STACK
-    _PyErr_StackItem *exc_info = tstate->exc_info;
-    tmp_type = exc_info->exc_type;
-    tmp_value = exc_info->exc_value;
-    tmp_tb = exc_info->exc_traceback;
-    exc_info->exc_type = *type;
-    exc_info->exc_value = *value;
-    exc_info->exc_traceback = *tb;
-  #else
-    tmp_type = tstate->exc_type;
-    tmp_value = tstate->exc_value;
-    tmp_tb = tstate->exc_traceback;
-    tstate->exc_type = *type;
-    tstate->exc_value = *value;
-    tstate->exc_traceback = *tb;
-  #endif
-    *type = tmp_type;
-    *value = tmp_value;
-    *tb = tmp_tb;
-}
-#else
-static CYTHON_INLINE void __Pyx_ExceptionSwap(PyObject **type, PyObject **value, PyObject **tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    PyErr_GetExcInfo(&tmp_type, &tmp_value, &tmp_tb);
-    PyErr_SetExcInfo(*type, *value, *tb);
-    *type = tmp_type;
-    *value = tmp_value;
-    *tb = tmp_tb;
-}
-#endif
-
-/* GetTopmostException */
-#if CYTHON_USE_EXC_INFO_STACK && CYTHON_FAST_THREAD_STATE
-static _PyErr_StackItem *
-__Pyx_PyErr_GetTopmostException(PyThreadState *tstate)
-{
-    _PyErr_StackItem *exc_info = tstate->exc_info;
-    while ((exc_info->exc_value == NULL || exc_info->exc_value == Py_None) &&
-           exc_info->previous_item != NULL)
-    {
-        exc_info = exc_info->previous_item;
-    }
-    return exc_info;
-}
-#endif
-
-/* SaveResetException */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx__ExceptionSave(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-  #if CYTHON_USE_EXC_INFO_STACK && PY_VERSION_HEX >= 0x030B00a4
-    _PyErr_StackItem *exc_info = __Pyx_PyErr_GetTopmostException(tstate);
-    PyObject *exc_value = exc_info->exc_value;
-    if (exc_value == NULL || exc_value == Py_None) {
-        *value = NULL;
-        *type = NULL;
-        *tb = NULL;
-    } else {
-        *value = exc_value;
-        Py_INCREF(*value);
-        *type = (PyObject*) Py_TYPE(exc_value);
-        Py_INCREF(*type);
-        *tb = PyException_GetTraceback(exc_value);
-    }
-  #elif CYTHON_USE_EXC_INFO_STACK
-    _PyErr_StackItem *exc_info = __Pyx_PyErr_GetTopmostException(tstate);
-    *type = exc_info->exc_type;
-    *value = exc_info->exc_value;
-    *tb = exc_info->exc_traceback;
-    Py_XINCREF(*type);
-    Py_XINCREF(*value);
-    Py_XINCREF(*tb);
-  #else
-    *type = tstate->exc_type;
-    *value = tstate->exc_value;
-    *tb = tstate->exc_traceback;
-    Py_XINCREF(*type);
-    Py_XINCREF(*value);
-    Py_XINCREF(*tb);
-  #endif
-}
-static CYTHON_INLINE void __Pyx__ExceptionReset(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
-  #if CYTHON_USE_EXC_INFO_STACK && PY_VERSION_HEX >= 0x030B00a4
-    _PyErr_StackItem *exc_info = tstate->exc_info;
-    PyObject *tmp_value = exc_info->exc_value;
-    exc_info->exc_value = value;
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(type);
-    Py_XDECREF(tb);
-  #else
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    #if CYTHON_USE_EXC_INFO_STACK
-    _PyErr_StackItem *exc_info = tstate->exc_info;
-    tmp_type = exc_info->exc_type;
-    tmp_value = exc_info->exc_value;
-    tmp_tb = exc_info->exc_traceback;
-    exc_info->exc_type = type;
-    exc_info->exc_value = value;
-    exc_info->exc_traceback = tb;
-    #else
-    tmp_type = tstate->exc_type;
-    tmp_value = tstate->exc_value;
-    tmp_tb = tstate->exc_traceback;
-    tstate->exc_type = type;
-    tstate->exc_value = value;
-    tstate->exc_traceback = tb;
-    #endif
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-  #endif
-}
-#endif
-
-/* PyIntCompare */
-static CYTHON_INLINE int __Pyx_PyInt_BoolEqObjC(PyObject *op1, PyObject *op2, long intval, long inplace) {
-    CYTHON_MAYBE_UNUSED_VAR(intval);
-    CYTHON_UNUSED_VAR(inplace);
-    if (op1 == op2) {
-        return 1;
-    }
-    #if PY_MAJOR_VERSION < 3
-    if (likely(PyInt_CheckExact(op1))) {
-        const long b = intval;
-        long a = PyInt_AS_LONG(op1);
-        return (a == b);
-    }
-    #endif
-    #if CYTHON_USE_PYLONG_INTERNALS
-    if (likely(PyLong_CheckExact(op1))) {
-        int unequal;
-        unsigned long uintval;
-        Py_ssize_t size = __Pyx_PyLong_DigitCount(op1);
-        const digit* digits = __Pyx_PyLong_Digits(op1);
-        if (intval == 0) {
-            return (__Pyx_PyLong_IsZero(op1) == 1);
-        } else if (intval < 0) {
-            if (__Pyx_PyLong_IsNonNeg(op1))
-                return 0;
-            intval = -intval;
-        } else {
-            if (__Pyx_PyLong_IsNeg(op1))
-                return 0;
-        }
-        uintval = (unsigned long) intval;
-#if PyLong_SHIFT * 4 < SIZEOF_LONG*8
-        if (uintval >> (PyLong_SHIFT * 4)) {
-            unequal = (size != 5) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
-                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[3] != ((uintval >> (3 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[4] != ((uintval >> (4 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
-        } else
-#endif
-#if PyLong_SHIFT * 3 < SIZEOF_LONG*8
-        if (uintval >> (PyLong_SHIFT * 3)) {
-            unequal = (size != 4) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
-                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[3] != ((uintval >> (3 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
-        } else
-#endif
-#if PyLong_SHIFT * 2 < SIZEOF_LONG*8
-        if (uintval >> (PyLong_SHIFT * 2)) {
-            unequal = (size != 3) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
-                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
-        } else
-#endif
-#if PyLong_SHIFT * 1 < SIZEOF_LONG*8
-        if (uintval >> (PyLong_SHIFT * 1)) {
-            unequal = (size != 2) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
-                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
-        } else
-#endif
-            unequal = (size != 1) || (((unsigned long) digits[0]) != (uintval & (unsigned long) PyLong_MASK));
-        return (unequal == 0);
-    }
-    #endif
-    if (PyFloat_CheckExact(op1)) {
-        const long b = intval;
-#if CYTHON_COMPILING_IN_LIMITED_API
-        double a = __pyx_PyFloat_AsDouble(op1);
-#else
-        double a = PyFloat_AS_DOUBLE(op1);
-#endif
-        return ((double)a == (double)b);
-    }
-    return __Pyx_PyObject_IsTrueAndDecref(
-        PyObject_RichCompare(op1, op2, Py_EQ));
-}
-
 /* RaiseTooManyValuesToUnpack */
 static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
     PyErr_Format(PyExc_ValueError,
@@ -7163,6 +7421,183 @@ static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, 
     return (inplace ? PyNumber_InPlaceAdd : PyNumber_Add)(op1, op2);
 }
 #endif
+
+/* GetTopmostException */
+#if CYTHON_USE_EXC_INFO_STACK && CYTHON_FAST_THREAD_STATE
+static _PyErr_StackItem *
+__Pyx_PyErr_GetTopmostException(PyThreadState *tstate)
+{
+    _PyErr_StackItem *exc_info = tstate->exc_info;
+    while ((exc_info->exc_value == NULL || exc_info->exc_value == Py_None) &&
+           exc_info->previous_item != NULL)
+    {
+        exc_info = exc_info->previous_item;
+    }
+    return exc_info;
+}
+#endif
+
+/* SaveResetException */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx__ExceptionSave(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+  #if CYTHON_USE_EXC_INFO_STACK && PY_VERSION_HEX >= 0x030B00a4
+    _PyErr_StackItem *exc_info = __Pyx_PyErr_GetTopmostException(tstate);
+    PyObject *exc_value = exc_info->exc_value;
+    if (exc_value == NULL || exc_value == Py_None) {
+        *value = NULL;
+        *type = NULL;
+        *tb = NULL;
+    } else {
+        *value = exc_value;
+        Py_INCREF(*value);
+        *type = (PyObject*) Py_TYPE(exc_value);
+        Py_INCREF(*type);
+        *tb = PyException_GetTraceback(exc_value);
+    }
+  #elif CYTHON_USE_EXC_INFO_STACK
+    _PyErr_StackItem *exc_info = __Pyx_PyErr_GetTopmostException(tstate);
+    *type = exc_info->exc_type;
+    *value = exc_info->exc_value;
+    *tb = exc_info->exc_traceback;
+    Py_XINCREF(*type);
+    Py_XINCREF(*value);
+    Py_XINCREF(*tb);
+  #else
+    *type = tstate->exc_type;
+    *value = tstate->exc_value;
+    *tb = tstate->exc_traceback;
+    Py_XINCREF(*type);
+    Py_XINCREF(*value);
+    Py_XINCREF(*tb);
+  #endif
+}
+static CYTHON_INLINE void __Pyx__ExceptionReset(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+  #if CYTHON_USE_EXC_INFO_STACK && PY_VERSION_HEX >= 0x030B00a4
+    _PyErr_StackItem *exc_info = tstate->exc_info;
+    PyObject *tmp_value = exc_info->exc_value;
+    exc_info->exc_value = value;
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(type);
+    Py_XDECREF(tb);
+  #else
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    #if CYTHON_USE_EXC_INFO_STACK
+    _PyErr_StackItem *exc_info = tstate->exc_info;
+    tmp_type = exc_info->exc_type;
+    tmp_value = exc_info->exc_value;
+    tmp_tb = exc_info->exc_traceback;
+    exc_info->exc_type = type;
+    exc_info->exc_value = value;
+    exc_info->exc_traceback = tb;
+    #else
+    tmp_type = tstate->exc_type;
+    tmp_value = tstate->exc_value;
+    tmp_tb = tstate->exc_traceback;
+    tstate->exc_type = type;
+    tstate->exc_value = value;
+    tstate->exc_traceback = tb;
+    #endif
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+  #endif
+}
+#endif
+
+/* GetException */
+#if CYTHON_FAST_THREAD_STATE
+static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb)
+#else
+static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb)
+#endif
+{
+    PyObject *local_type = NULL, *local_value, *local_tb = NULL;
+#if CYTHON_FAST_THREAD_STATE
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+  #if PY_VERSION_HEX >= 0x030C00A6
+    local_value = tstate->current_exception;
+    tstate->current_exception = 0;
+    if (likely(local_value)) {
+        local_type = (PyObject*) Py_TYPE(local_value);
+        Py_INCREF(local_type);
+        local_tb = PyException_GetTraceback(local_value);
+    }
+  #else
+    local_type = tstate->curexc_type;
+    local_value = tstate->curexc_value;
+    local_tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+  #endif
+#else
+    PyErr_Fetch(&local_type, &local_value, &local_tb);
+#endif
+    PyErr_NormalizeException(&local_type, &local_value, &local_tb);
+#if CYTHON_FAST_THREAD_STATE && PY_VERSION_HEX >= 0x030C00A6
+    if (unlikely(tstate->current_exception))
+#elif CYTHON_FAST_THREAD_STATE
+    if (unlikely(tstate->curexc_type))
+#else
+    if (unlikely(PyErr_Occurred()))
+#endif
+        goto bad;
+    #if PY_MAJOR_VERSION >= 3
+    if (local_tb) {
+        if (unlikely(PyException_SetTraceback(local_value, local_tb) < 0))
+            goto bad;
+    }
+    #endif
+    Py_XINCREF(local_tb);
+    Py_XINCREF(local_type);
+    Py_XINCREF(local_value);
+    *type = local_type;
+    *value = local_value;
+    *tb = local_tb;
+#if CYTHON_FAST_THREAD_STATE
+    #if CYTHON_USE_EXC_INFO_STACK
+    {
+        _PyErr_StackItem *exc_info = tstate->exc_info;
+      #if PY_VERSION_HEX >= 0x030B00a4
+        tmp_value = exc_info->exc_value;
+        exc_info->exc_value = local_value;
+        tmp_type = NULL;
+        tmp_tb = NULL;
+        Py_XDECREF(local_type);
+        Py_XDECREF(local_tb);
+      #else
+        tmp_type = exc_info->exc_type;
+        tmp_value = exc_info->exc_value;
+        tmp_tb = exc_info->exc_traceback;
+        exc_info->exc_type = local_type;
+        exc_info->exc_value = local_value;
+        exc_info->exc_traceback = local_tb;
+      #endif
+    }
+    #else
+    tmp_type = tstate->exc_type;
+    tmp_value = tstate->exc_value;
+    tmp_tb = tstate->exc_traceback;
+    tstate->exc_type = local_type;
+    tstate->exc_value = local_value;
+    tstate->exc_traceback = local_tb;
+    #endif
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+#else
+    PyErr_SetExcInfo(local_type, local_value, local_tb);
+#endif
+    return 0;
+bad:
+    *type = 0;
+    *value = 0;
+    *tb = 0;
+    Py_XDECREF(local_type);
+    Py_XDECREF(local_value);
+    Py_XDECREF(local_tb);
+    return -1;
+}
 
 /* RaiseUnexpectedTypeError */
 static int
@@ -9065,6 +9500,279 @@ bad:
     }
 
 /* CIntFromPy */
+static CYTHON_INLINE uint16_t __Pyx_PyInt_As_uint16_t(PyObject *x) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const uint16_t neg_one = (uint16_t) -1, const_zero = (uint16_t) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+#if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_Check(x))) {
+        if ((sizeof(uint16_t) < sizeof(long))) {
+            __PYX_VERIFY_RETURN_INT(uint16_t, long, PyInt_AS_LONG(x))
+        } else {
+            long val = PyInt_AS_LONG(x);
+            if (is_unsigned && unlikely(val < 0)) {
+                goto raise_neg_overflow;
+            }
+            return (uint16_t) val;
+        }
+    } else
+#endif
+    if (likely(PyLong_Check(x))) {
+        if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+            if (unlikely(__Pyx_PyLong_IsNeg(x))) {
+                goto raise_neg_overflow;
+            } else if (__Pyx_PyLong_IsCompact(x)) {
+                __PYX_VERIFY_RETURN_INT(uint16_t, __Pyx_compact_upylong, __Pyx_PyLong_CompactValueUnsigned(x))
+            } else {
+                const digit* digits = __Pyx_PyLong_Digits(x);
+                assert(__Pyx_PyLong_DigitCount(x) > 1);
+                switch (__Pyx_PyLong_DigitCount(x)) {
+                    case 2:
+                        if ((8 * sizeof(uint16_t) > 1 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) >= 2 * PyLong_SHIFT)) {
+                                return (uint16_t) (((((uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0]));
+                            }
+                        }
+                        break;
+                    case 3:
+                        if ((8 * sizeof(uint16_t) > 2 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) >= 3 * PyLong_SHIFT)) {
+                                return (uint16_t) (((((((uint16_t)digits[2]) << PyLong_SHIFT) | (uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0]));
+                            }
+                        }
+                        break;
+                    case 4:
+                        if ((8 * sizeof(uint16_t) > 3 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) >= 4 * PyLong_SHIFT)) {
+                                return (uint16_t) (((((((((uint16_t)digits[3]) << PyLong_SHIFT) | (uint16_t)digits[2]) << PyLong_SHIFT) | (uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0]));
+                            }
+                        }
+                        break;
+                }
+            }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030C00A7
+            if (unlikely(Py_SIZE(x) < 0)) {
+                goto raise_neg_overflow;
+            }
+#else
+            {
+                int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+                if (unlikely(result < 0))
+                    return (uint16_t) -1;
+                if (unlikely(result == 1))
+                    goto raise_neg_overflow;
+            }
+#endif
+            if ((sizeof(uint16_t) <= sizeof(unsigned long))) {
+                __PYX_VERIFY_RETURN_INT_EXC(uint16_t, unsigned long, PyLong_AsUnsignedLong(x))
+#ifdef HAVE_LONG_LONG
+            } else if ((sizeof(uint16_t) <= sizeof(unsigned PY_LONG_LONG))) {
+                __PYX_VERIFY_RETURN_INT_EXC(uint16_t, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+#endif
+            }
+        } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+            if (__Pyx_PyLong_IsCompact(x)) {
+                __PYX_VERIFY_RETURN_INT(uint16_t, __Pyx_compact_pylong, __Pyx_PyLong_CompactValue(x))
+            } else {
+                const digit* digits = __Pyx_PyLong_Digits(x);
+                assert(__Pyx_PyLong_DigitCount(x) > 1);
+                switch (__Pyx_PyLong_SignedDigitCount(x)) {
+                    case -2:
+                        if ((8 * sizeof(uint16_t) - 1 > 1 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) - 1 > 2 * PyLong_SHIFT)) {
+                                return (uint16_t) (((uint16_t)-1)*(((((uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0])));
+                            }
+                        }
+                        break;
+                    case 2:
+                        if ((8 * sizeof(uint16_t) > 1 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 2 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) - 1 > 2 * PyLong_SHIFT)) {
+                                return (uint16_t) ((((((uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0])));
+                            }
+                        }
+                        break;
+                    case -3:
+                        if ((8 * sizeof(uint16_t) - 1 > 2 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) - 1 > 3 * PyLong_SHIFT)) {
+                                return (uint16_t) (((uint16_t)-1)*(((((((uint16_t)digits[2]) << PyLong_SHIFT) | (uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0])));
+                            }
+                        }
+                        break;
+                    case 3:
+                        if ((8 * sizeof(uint16_t) > 2 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 3 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) - 1 > 3 * PyLong_SHIFT)) {
+                                return (uint16_t) ((((((((uint16_t)digits[2]) << PyLong_SHIFT) | (uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0])));
+                            }
+                        }
+                        break;
+                    case -4:
+                        if ((8 * sizeof(uint16_t) - 1 > 3 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) - 1 > 4 * PyLong_SHIFT)) {
+                                return (uint16_t) (((uint16_t)-1)*(((((((((uint16_t)digits[3]) << PyLong_SHIFT) | (uint16_t)digits[2]) << PyLong_SHIFT) | (uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0])));
+                            }
+                        }
+                        break;
+                    case 4:
+                        if ((8 * sizeof(uint16_t) > 3 * PyLong_SHIFT)) {
+                            if ((8 * sizeof(unsigned long) > 4 * PyLong_SHIFT)) {
+                                __PYX_VERIFY_RETURN_INT(uint16_t, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                            } else if ((8 * sizeof(uint16_t) - 1 > 4 * PyLong_SHIFT)) {
+                                return (uint16_t) ((((((((((uint16_t)digits[3]) << PyLong_SHIFT) | (uint16_t)digits[2]) << PyLong_SHIFT) | (uint16_t)digits[1]) << PyLong_SHIFT) | (uint16_t)digits[0])));
+                            }
+                        }
+                        break;
+                }
+            }
+#endif
+            if ((sizeof(uint16_t) <= sizeof(long))) {
+                __PYX_VERIFY_RETURN_INT_EXC(uint16_t, long, PyLong_AsLong(x))
+#ifdef HAVE_LONG_LONG
+            } else if ((sizeof(uint16_t) <= sizeof(PY_LONG_LONG))) {
+                __PYX_VERIFY_RETURN_INT_EXC(uint16_t, PY_LONG_LONG, PyLong_AsLongLong(x))
+#endif
+            }
+        }
+        {
+            uint16_t val;
+            PyObject *v = __Pyx_PyNumber_IntOrLong(x);
+#if PY_MAJOR_VERSION < 3
+            if (likely(v) && !PyLong_Check(v)) {
+                PyObject *tmp = v;
+                v = PyNumber_Long(tmp);
+                Py_DECREF(tmp);
+            }
+#endif
+            if (likely(v)) {
+                int ret = -1;
+#if PY_VERSION_HEX < 0x030d0000 && !(CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_LIMITED_API) || defined(_PyLong_AsByteArray)
+                int one = 1; int is_little = (int)*(unsigned char *)&one;
+                unsigned char *bytes = (unsigned char *)&val;
+                ret = _PyLong_AsByteArray((PyLongObject *)v,
+                                           bytes, sizeof(val),
+                                           is_little, !is_unsigned);
+#else
+                PyObject *stepval = NULL, *mask = NULL, *shift = NULL;
+                int bits, remaining_bits, is_negative = 0;
+                long idigit;
+                int chunk_size = (sizeof(long) < 8) ? 30 : 62;
+                if (unlikely(!PyLong_CheckExact(v))) {
+                    PyObject *tmp = v;
+                    v = PyNumber_Long(v);
+                    assert(PyLong_CheckExact(v));
+                    Py_DECREF(tmp);
+                    if (unlikely(!v)) return (uint16_t) -1;
+                }
+#if CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030B0000
+                if (Py_SIZE(x) == 0)
+                    return (uint16_t) 0;
+                is_negative = Py_SIZE(x) < 0;
+#else
+                {
+                    int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+                    if (unlikely(result < 0))
+                        return (uint16_t) -1;
+                    is_negative = result == 1;
+                }
+#endif
+                if (is_unsigned && unlikely(is_negative)) {
+                    goto raise_neg_overflow;
+                } else if (is_negative) {
+                    stepval = PyNumber_Invert(v);
+                    if (unlikely(!stepval))
+                        return (uint16_t) -1;
+                } else {
+                    stepval = __Pyx_NewRef(v);
+                }
+                val = (uint16_t) 0;
+                mask = PyLong_FromLong((1L << chunk_size) - 1); if (unlikely(!mask)) goto done;
+                shift = PyLong_FromLong(chunk_size); if (unlikely(!shift)) goto done;
+                for (bits = 0; bits < (int) sizeof(uint16_t) * 8 - chunk_size; bits += chunk_size) {
+                    PyObject *tmp, *digit;
+                    digit = PyNumber_And(stepval, mask);
+                    if (unlikely(!digit)) goto done;
+                    idigit = PyLong_AsLong(digit);
+                    Py_DECREF(digit);
+                    if (unlikely(idigit < 0)) goto done;
+                    tmp = PyNumber_Rshift(stepval, shift);
+                    if (unlikely(!tmp)) goto done;
+                    Py_DECREF(stepval); stepval = tmp;
+                    val |= ((uint16_t) idigit) << bits;
+                    #if CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030B0000
+                    if (Py_SIZE(stepval) == 0)
+                        goto unpacking_done;
+                    #endif
+                }
+                idigit = PyLong_AsLong(stepval);
+                if (unlikely(idigit < 0)) goto done;
+                remaining_bits = ((int) sizeof(uint16_t) * 8) - bits - (is_unsigned ? 0 : 1);
+                if (unlikely(idigit >= (1L << remaining_bits)))
+                    goto raise_overflow;
+                val |= ((uint16_t) idigit) << bits;
+            #if CYTHON_COMPILING_IN_LIMITED_API && PY_VERSION_HEX < 0x030B0000
+            unpacking_done:
+            #endif
+                if (!is_unsigned) {
+                    if (unlikely(val & (((uint16_t) 1) << (sizeof(uint16_t) * 8 - 1))))
+                        goto raise_overflow;
+                    if (is_negative)
+                        val = ~val;
+                }
+                ret = 0;
+            done:
+                Py_XDECREF(shift);
+                Py_XDECREF(mask);
+                Py_XDECREF(stepval);
+#endif
+                Py_DECREF(v);
+                if (likely(!ret))
+                    return val;
+            }
+            return (uint16_t) -1;
+        }
+    } else {
+        uint16_t val;
+        PyObject *tmp = __Pyx_PyNumber_IntOrLong(x);
+        if (!tmp) return (uint16_t) -1;
+        val = __Pyx_PyInt_As_uint16_t(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to uint16_t");
+    return (uint16_t) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to uint16_t");
+    return (uint16_t) -1;
+}
+
+/* CIntFromPy */
 static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
 #ifdef __Pyx_HAS_GCC_DIAGNOSTIC
 #pragma GCC diagnostic push
@@ -9411,7 +10119,7 @@ __Pyx_PyType_GetName(PyTypeObject* tp)
     if (unlikely(name == NULL) || unlikely(!PyUnicode_Check(name))) {
         PyErr_Clear();
         Py_XDECREF(name);
-        name = __Pyx_NewRef(__pyx_n_s__14);
+        name = __Pyx_NewRef(__pyx_n_s__18);
     }
     return name;
 }
