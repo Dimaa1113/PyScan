@@ -1,26 +1,22 @@
 # port_scanner/__init__.py
-import concurrent.futures
-import os # For os.cpu_count() for default max_workers, though ThreadPoolExecutor handles None.
-from collections import defaultdict
 
-# Attempt to import the compiled Cython module components
 try:
-    # _scan_port_cython is the core C-level port scanning function.
-    # _parse_ip_range_py is the Cython helper for parsing IP ranges (Python callable).
-    from .scanner.scanner import (
-        scan_port as _scan_port_cython,  # This is the Python-callable wrapper in Cython for c_scan_port
-        _parse_ip_range_py  # This is the 'def' function in Cython for parsing
-    )
-    # The following Cython functions that do sequential scanning are no longer directly used by these Python API functions.
-    # scan_ports_single_ip as _scan_ports_single_ip_cython,
-    # scan_ip_range as _scan_ip_range_cython,
-    # scan_ip_list as _scan_ip_list_cython
+    # This is the Python-callable wrapper in scanner.pyx which calls c_scan_port
+    from .scanner.scanner import scan_port as _scan_port_cython
+    # This is the new Cython function that handles its own ThreadPoolExecutor
+    from .scanner.scanner import scan_targets_parallel_cython as _scan_targets_parallel_cython
 except ImportError as e:
-    raise ImportError(
-        "Cython-compiled scanner module or required functions not found. "
-        "Please ensure the package is installed correctly and "
-        "the Cython modules are compiled. Original error: {}".format(e)
+    # Catching the error and providing a more informative message
+    error_message = (
+        "Cython-compiled scanner module not found or missing key functions "
+        "(e.g., _scan_port_cython, _scan_targets_parallel_cython).\n"
+        "Please ensure the package is installed correctly and the Cython modules are compiled.\n"
+        "Original error: {}".format(e)
     )
+    # Depending on the desired behavior, you might log this, or ensure it's visible.
+    # For now, raising a new ImportError with the detailed message.
+    raise ImportError(error_message) from e
+
 
 def is_valid_port(port: int) -> bool:
     """Checks if a port number is valid (1-65535)."""
@@ -31,10 +27,10 @@ def _validate_timeout(timeout_seconds: float):
     if not isinstance(timeout_seconds, (int, float)) or timeout_seconds <= 0:
         raise ValueError("Timeout must be a positive number.")
 
-def _validate_max_workers(max_workers: int = None):
-    """Validates the max_workers parameter."""
-    if max_workers is not None and (not isinstance(max_workers, int) or max_workers <= 0):
-        raise ValueError("max_workers must be None or a positive integer.")
+def _validate_max_workers(max_workers: int = 0):
+    """Validates the max_workers parameter. Default 0 for Cython to interpret as 'use default'."""
+    if not isinstance(max_workers, int) or max_workers < 0: # Allow 0 for default in Cython layer
+        raise ValueError("max_workers must be a non-negative integer (0 means use Cython's default).")
 
 def scan_single_port(ip_address: str, port: int, timeout_seconds: float = 1.0) -> bool:
     """
@@ -57,21 +53,21 @@ def scan_single_port(ip_address: str, port: int, timeout_seconds: float = 1.0) -
     if not isinstance(port, int) or not is_valid_port(port):
         raise ValueError(f"Invalid port number: {port}. Must be an integer between 1 and 65535.")
 
-    # _scan_port_cython is the Python-callable wrapper in scanner.pyx which calls c_scan_port
     return _scan_port_cython(ip_address.encode('utf-8'), port, timeout_seconds)
 
-def scan_multiple_ports(ip_address: str, ports: list[int], timeout_seconds: float = 1.0, max_workers: int = None) -> list[int]:
+def scan_multiple_ports(ip_address: str, ports: list[int], timeout_seconds: float = 1.0, max_workers: int = 0) -> list[int]:
     """
-    Scans multiple ports on a single IP address in parallel.
+    Scans multiple ports on a single IP address using the parallel Cython function.
 
     Args:
         ip_address: The target IP address.
         ports: A list of port numbers to scan.
         timeout_seconds: Connection timeout for each port. Default is 1.0.
-        max_workers: Maximum number of threads to use. Defaults to ThreadPoolExecutor default.
+        max_workers: Max worker threads for the Cython function.
+                     0 means default (CPU core based).
 
     Returns:
-        A sorted list of open port numbers.
+        A sorted list of open port numbers for the given IP.
     """
     _validate_timeout(timeout_seconds)
     _validate_max_workers(max_workers)
@@ -80,33 +76,25 @@ def scan_multiple_ports(ip_address: str, ports: list[int], timeout_seconds: floa
     if not isinstance(ports, list) or not all(isinstance(p, int) and is_valid_port(p) for p in ports):
         raise ValueError("Ports must be a list of integers between 1 and 65535.")
 
-    open_ports = []
-    encoded_ip = ip_address.encode('utf-8')
+    if not ports:
+        return []
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_port = {
-            executor.submit(_scan_port_cython, encoded_ip, port, timeout_seconds): port
-            for port in set(ports) # Use set to avoid scanning the same port multiple times
-        }
-        for future in concurrent.futures.as_completed(future_to_port):
-            port = future_to_port[future]
-            try:
-                if future.result():
-                    open_ports.append(port)
-            except Exception:
-                # print(f"Error scanning port {port} on {ip_address}: {e}") # Optional logging
-                pass # Port considered closed or scan failed for it
-    return sorted(open_ports)
+    # targets_py for _scan_targets_parallel_cython is a list of strings (IPs or ranges)
+    results_dict = _scan_targets_parallel_cython([ip_address], ports, timeout_seconds, max_workers)
 
-def scan_ip_range_ports(ip_range_str: str, ports: list[int], timeout_seconds: float = 1.0, max_workers: int = None) -> dict[str, list[int]]:
+    # _scan_targets_parallel_cython returns a dict {ip: [open_ports]}, extract the list for the single IP
+    return results_dict.get(ip_address, []) # Returns sorted list from Cython
+
+
+def scan_ip_range_ports(ip_range_str: str, ports: list[int], timeout_seconds: float = 1.0, max_workers: int = 0) -> dict[str, list[int]]:
     """
-    Scans a range of IP addresses for specified ports in parallel.
+    Scans a range of IP addresses for specified ports using the parallel Cython function.
 
     Args:
         ip_range_str: The IP range string (e.g., "192.168.1.1-192.168.1.10" or a single IP).
         ports: A list of port numbers to scan.
         timeout_seconds: Connection timeout for each port. Default is 1.0.
-        max_workers: Maximum number of threads to use.
+        max_workers: Max worker threads for the Cython function. 0 for default.
 
     Returns:
         A dictionary where keys are IP addresses with open ports, and values are sorted lists of those ports.
@@ -118,85 +106,38 @@ def scan_ip_range_ports(ip_range_str: str, ports: list[int], timeout_seconds: fl
     if not isinstance(ports, list) or not all(isinstance(p, int) and is_valid_port(p) for p in ports):
         raise ValueError("Ports must be a list of integers between 1 and 65535.")
 
-    ips_to_scan = _parse_ip_range_py(ip_range_str)
-    if not ips_to_scan:
+    if not ports: # If no ports to scan, return empty results
         return {}
 
-    # Using defaultdict to simplify appending to lists
-    results = defaultdict(list)
-    tasks = []
-    for ip_str in ips_to_scan:
-        for port_num in set(ports): # Use set for unique ports per IP
-            tasks.append((ip_str, port_num))
+    # targets_py is a list of strings
+    return _scan_targets_parallel_cython([ip_range_str], ports, timeout_seconds, max_workers)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_task = {
-            executor.submit(_scan_port_cython, task_ip.encode('utf-8'), task_port, timeout_seconds): (task_ip, task_port)
-            for task_ip, task_port in tasks
-        }
-        for future in concurrent.futures.as_completed(future_to_task):
-            task_ip, task_port = future_to_task[future]
-            try:
-                if future.result():
-                    results[task_ip].append(task_port)
-            except Exception:
-                # print(f"Error scanning port {task_port} on {task_ip}: {e}") # Optional logging
-                pass
 
-    # Convert defaultdict to dict and sort port lists
-    final_results = {ip: sorted(port_list) for ip, port_list in results.items() if port_list}
-    return final_results
-
-def scan_ip_list_ports(ip_list: list[str], ports: list[int], timeout_seconds: float = 1.0, max_workers: int = None) -> dict[str, list[int]]:
+def scan_ip_list_ports(ip_list: list[str], ports: list[int], timeout_seconds: float = 1.0, max_workers: int = 0) -> dict[str, list[int]]:
     """
-    Scans a list of IP addresses and/or IP ranges for specified ports in parallel.
+    Scans a list of IP addresses and/or IP ranges for specified ports using the parallel Cython function.
 
     Args:
         ip_list: A list of IP/IP range strings.
         ports: A list of port numbers to scan.
         timeout_seconds: Connection timeout for each port. Default is 1.0.
-        max_workers: Maximum number of threads to use.
+        max_workers: Max worker threads for the Cython function. 0 for default.
 
     Returns:
         A dictionary where keys are IP addresses with open ports, and values are sorted lists of those ports.
     """
     _validate_timeout(timeout_seconds)
-    _validate_max_workers(max_workers)
+    _validate_max_workers(max_workers) # Validates max_workers is non-negative
     if not isinstance(ip_list, list) or not all(isinstance(item, str) for item in ip_list):
         raise ValueError("IP list must be a list of strings.")
     if not isinstance(ports, list) or not all(isinstance(p, int) and is_valid_port(p) for p in ports):
         raise ValueError("Ports must be a list of integers between 1 and 65535.")
 
-    all_individual_ips = []
-    for item_str in ip_list:
-        all_individual_ips.extend(_parse_ip_range_py(item_str))
-
-    unique_ips_to_scan = sorted(list(set(all_individual_ips)))
-    if not unique_ips_to_scan:
+    if not ip_list or not ports: # If no IPs or no ports, return empty
         return {}
 
-    results = defaultdict(list)
-    tasks = []
-    for ip_str in unique_ips_to_scan:
-        for port_num in set(ports): # Use set for unique ports per IP
-            tasks.append((ip_str, port_num))
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_task = {
-            executor.submit(_scan_port_cython, task_ip.encode('utf-8'), task_port, timeout_seconds): (task_ip, task_port)
-            for task_ip, task_port in tasks
-        }
-        for future in concurrent.futures.as_completed(future_to_task):
-            task_ip, task_port = future_to_task[future]
-            try:
-                if future.result():
-                    results[task_ip].append(task_port)
-            except Exception:
-                # print(f"Error scanning port {task_port} on {task_ip}: {e}") # Optional logging
-                pass
-
-    final_results = {ip: sorted(port_list) for ip, port_list in results.items() if port_list}
-    return final_results
+    # ip_list is already in the correct format for targets_py
+    return _scan_targets_parallel_cython(ip_list, ports, timeout_seconds, max_workers)
 
 __all__ = [
     'scan_single_port',

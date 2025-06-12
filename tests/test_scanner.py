@@ -144,18 +144,17 @@ class TestPythonWrappersAndCore(TestWithServerBase):
 
     # --- New max_workers validation tests ---
     def test_scan_multiple_ports_workers_validation(self):
-        with self.assertRaisesRegex(ValueError, "max_workers must be None or a positive integer"):
-            scan_multiple_ports(TEST_HOST, [TEST_PORT_FOR_TIMEOUT_TEST], max_workers=0)
-        with self.assertRaisesRegex(ValueError, "max_workers must be None or a positive integer"):
+        with self.assertRaisesRegex(ValueError, "max_workers must be a non-negative integer"):
             scan_multiple_ports(TEST_HOST, [TEST_PORT_FOR_TIMEOUT_TEST], max_workers=-1)
+        # max_workers=0 is now valid (means default)
 
     def test_scan_ip_range_ports_workers_validation(self):
-        with self.assertRaisesRegex(ValueError, "max_workers must be None or a positive integer"):
-            scan_ip_range_ports(TEST_HOST, [TEST_PORT_FOR_TIMEOUT_TEST], max_workers=0)
+        with self.assertRaisesRegex(ValueError, "max_workers must be a non-negative integer"):
+            scan_ip_range_ports(TEST_HOST, [TEST_PORT_FOR_TIMEOUT_TEST], max_workers=-1)
 
     def test_scan_ip_list_ports_workers_validation(self):
-        with self.assertRaisesRegex(ValueError, "max_workers must be None or a positive integer"):
-            scan_ip_list_ports([TEST_HOST], [TEST_PORT_FOR_TIMEOUT_TEST], max_workers=0)
+        with self.assertRaisesRegex(ValueError, "max_workers must be a non-negative integer"):
+            scan_ip_list_ports([TEST_HOST], [TEST_PORT_FOR_TIMEOUT_TEST], max_workers=-1)
 
     # --- Updated scan tests with max_workers parameterization ---
     def test_scan_single_port_with_normal_timeout(self): # No workers for single port scan
@@ -169,7 +168,7 @@ class TestPythonWrappersAndCore(TestWithServerBase):
         self.assertFalse(scan_single_port(TEST_HOST, TEST_CLOSED_PORT))
 
     def test_scan_multiple_ports_mixed(self):
-        for workers in [None, 1, 3]: # Test with default, 1, and 3 workers
+        for workers in [0, 1, 3]: # Test with 0 (default), 1, and 3 workers
             with self.subTest(workers=workers):
                 open_ports = scan_multiple_ports(TEST_HOST, TEST_ALL_TARGET_PORTS,
                                                  timeout_seconds=1.0, max_workers=workers)
@@ -177,7 +176,7 @@ class TestPythonWrappersAndCore(TestWithServerBase):
 
     def test_scan_ip_range_ports_single_ip(self):
         ip_range_str = f"{TEST_HOST}-{TEST_HOST}"
-        for workers in [None, 1, 3]:
+        for workers in [0, 1, 3]: # Test with 0 (default), 1, and 3 workers
             with self.subTest(workers=workers):
                 results = scan_ip_range_ports(ip_range_str, TEST_ALL_TARGET_PORTS,
                                               timeout_seconds=1.0, max_workers=workers)
@@ -186,7 +185,7 @@ class TestPythonWrappersAndCore(TestWithServerBase):
 
     def test_scan_ip_list_ports(self):
         ip_list = [TEST_HOST, f"{TEST_HOST}-{TEST_HOST}"]
-        for workers in [None, 1, 3]:
+        for workers in [0, 1, 3]: # Test with 0 (default), 1, and 3 workers
             with self.subTest(workers=workers):
                 results = scan_ip_list_ports(ip_list, TEST_ALL_TARGET_PORTS,
                                              timeout_seconds=1.0, max_workers=workers)

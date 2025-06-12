@@ -4,6 +4,8 @@
 # cython: wraparound=False
 
 import ipaddress # Keep for _parse_ip_range_py
+import concurrent.futures # Added
+from collections import defaultdict # Added
 
 # C standard library imports
 from libc.stdint cimport uint16_t, uint32_t
@@ -107,8 +109,6 @@ cpdef bint c_scan_port(const char* host_ip, uint16_t port_num, double timeout_se
     if tv.tv_usec >= 1000000:
         tv.tv_usec = 999999
 
-    # If timeout_seconds was > 0 but calculated tv_sec and tv_usec are both 0,
-    # make tv_usec 1 to avoid polling, ensuring a minimal wait.
     if timeout_seconds > 0 and tv.tv_sec == 0 and tv.tv_usec == 0:
         tv.tv_usec = 1
 
@@ -130,12 +130,10 @@ cpdef bint c_scan_port(const char* host_ip, uint16_t port_num, double timeout_se
 def scan_port(bytes host, int port, double timeout_seconds=1.0):
     """
     (Cython Python-Wrapper) Scans a single port on a single host using c_scan_port.
-
     Args:
         host: The target host IP address (as bytes).
         port: The target port number.
         timeout_seconds: Connection timeout in seconds. Default is 1.0.
-
     Returns:
         True if the port is open, False otherwise.
     """
@@ -143,25 +141,6 @@ def scan_port(bytes host, int port, double timeout_seconds=1.0):
         return False
     cdef const char* host_c_str = host
     return c_scan_port(host_c_str, <uint16_t>port, timeout_seconds)
-
-def scan_ports_single_ip(bytes host, list ports_to_scan, double timeout_seconds=1.0):
-    """
-    (Cython) Scans multiple ports on a single host.
-
-    Args:
-        host: The target host IP address (as bytes).
-        ports_to_scan: A list of port numbers.
-        timeout_seconds: Connection timeout for each port. Default is 1.0.
-
-    Returns:
-        A list of open port numbers.
-    """
-    cdef list open_ports = []
-    cdef int port_num
-    for port_num in ports_to_scan:
-        if scan_port(host, port_num, timeout_seconds): # Pass timeout
-            open_ports.append(port_num)
-    return open_ports
 
 def _parse_ip_range_py(ip_range_str_py):
     """
@@ -178,7 +157,7 @@ def _parse_ip_range_py(ip_range_str_py):
             current_ip_int = int(start_ip)
             end_ip_int = int(end_ip)
             if current_ip_int > end_ip_int: return []
-            if (end_ip_int - current_ip_int + 1) > 4096: return []
+            if (end_ip_int - current_ip_int + 1) > 4096: return [] # Safety limit
             for ip_int_val in range(current_ip_int, end_ip_int + 1):
                 result_ips.append(str(ipaddress.ip_address(ip_int_val)))
             return result_ips
@@ -187,50 +166,86 @@ def _parse_ip_range_py(ip_range_str_py):
             return [str(single_ip)]
     except ValueError: return []
 
-cpdef dict scan_ip_range(str ip_range_str_py, list ports_to_scan_py, double timeout_seconds=1.0):
+cpdef dict scan_targets_parallel_cython(list targets_py, list ports_py, double timeout_seconds=1.0, int max_workers=0):
     """
-    (Cython) Scans a range of IP addresses for specified ports.
+    (Cython) Scans a list of targets (IPs or IP ranges) for specified ports in parallel.
+    Core parallel scanning logic using ThreadPoolExecutor is implemented here.
 
     Args:
-        ip_range_str_py: The IP range string (e.g., "192.168.1.1-192.168.1.10").
-        ports_to_scan_py: A list of port numbers to scan.
-        timeout_seconds: Connection timeout for each port. Default is 1.0.
+        targets_py: A Python list of strings, where each string can be a
+                    single IP or an IP range (e.g., "192.168.1.1-192.168.1.10").
+        ports_py: A Python list of integer port numbers to scan.
+        timeout_seconds: Connection timeout in seconds for each port scan.
+        max_workers: Maximum number of worker threads. If 0 or non-positive,
+                     ThreadPoolExecutor's default (usually CPU core based) is used.
 
     Returns:
-        A dictionary where keys are IP addresses and values are lists of open ports.
+        A Python dictionary where keys are IP addresses (strings) and
+        values are lists of open port numbers for that IP.
     """
-    cdef dict results = {}
-    cdef list ips_to_scan_py = _parse_ip_range_py(ip_range_str_py)
-    cdef str ip_address_py_loopvar
-    cdef list open_ports_py
+    cdef list all_ips_to_scan_py = []
+    cdef str target_item_py
+    cdef list parsed_ips_py
+    cdef bytes ip_bytes_for_task
 
-    for ip_address_py_loopvar in ips_to_scan_py:
-        if not isinstance(ip_address_py_loopvar, str): continue
-        ip_address_bytes = ip_address_py_loopvar.encode('utf-8')
-        open_ports_py = scan_ports_single_ip(ip_address_bytes, ports_to_scan_py, timeout_seconds) # Pass timeout
-        if open_ports_py:
-            results[ip_address_py_loopvar] = open_ports_py
-    return results
+    for target_item_py in targets_py:
+        if not isinstance(target_item_py, str):
+            continue
+        parsed_ips_py = _parse_ip_range_py(target_item_py)
+        all_ips_to_scan_py.extend(parsed_ips_py)
 
-cpdef dict scan_ip_list(list ip_list_py, list ports_to_scan_py, double timeout_seconds=1.0):
-    """
-    (Cython) Scans a list of IP addresses and/or IP ranges for specified ports.
+    if not all_ips_to_scan_py:
+        return {}
 
-    Args:
-        ip_list_py: A list of IP/IP range strings.
-        ports_to_scan_py: A list of port numbers to scan.
-        timeout_seconds: Connection timeout for each port. Default is 1.0.
+    cdef set unique_ip_set_py = set(all_ips_to_scan_py)
+    cdef list unique_ips_list_py = sorted(list(unique_ip_set_py))
 
-    Returns:
-        A dictionary where keys are IP addresses and values are lists of open ports.
-    """
-    cdef dict aggregated_results = {}
-    cdef str ip_definition_str_py_loopvar
-    cdef dict range_results_py
+    if not unique_ips_list_py:
+        return {}
 
-    for ip_definition_str_py_loopvar in ip_list_py:
-        if not isinstance(ip_definition_str_py_loopvar, str): continue
-        range_results_py = scan_ip_range(ip_definition_str_py_loopvar, ports_to_scan_py, timeout_seconds) # Pass timeout
-        aggregated_results.update(range_results_py)
+    cdef list scan_tasks_py = []
+    cdef str ip_str_py
+    cdef int port_num_py
+    cdef set unique_ports_set_py = set(ports_py)
 
-    return aggregated_results
+    for ip_str_py in unique_ips_list_py:
+        for port_num_py in unique_ports_set_py:
+            scan_tasks_py.append((ip_str_py, port_num_py))
+
+    if not scan_tasks_py:
+        return {}
+
+    results_py = defaultdict(list)
+
+    cdef int actual_max_workers_for_executor
+    if max_workers <= 0:
+        actual_max_workers_for_executor = -1 # Sentinel for None (ThreadPoolExecutor default)
+    else:
+        actual_max_workers_for_executor = max_workers
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=None if actual_max_workers_for_executor == -1 else actual_max_workers_for_executor) as executor:
+        future_to_task_map_py = {}
+
+        for ip_str_task_py, port_num_task_py in scan_tasks_py:
+            ip_bytes_for_task = ip_str_task_py.encode('utf-8')
+            future = executor.submit(scan_port, ip_bytes_for_task, port_num_task_py, timeout_seconds)
+            future_to_task_map_py[future] = (ip_str_task_py, port_num_task_py)
+
+        for future in concurrent.futures.as_completed(future_to_task_map_py):
+            ip_str_res_py, port_num_res_py = future_to_task_map_py[future]
+            try:
+                is_open = future.result()
+                if is_open:
+                    results_py[ip_str_res_py].append(port_num_res_py)
+            except Exception as e:
+                # print(f"Error scanning {ip_str_res_py}:{port_num_res_py}: {e}")
+                pass
+
+    cdef dict final_results_py = {}
+    cdef str key_ip_py
+    cdef list open_ports_list_py
+    for key_ip_py, open_ports_list_py in results_py.items():
+        if open_ports_list_py:
+            final_results_py[key_ip_py] = sorted(open_ports_list_py)
+
+    return final_results_py

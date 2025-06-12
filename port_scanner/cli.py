@@ -84,8 +84,11 @@ def main():
 
     ports_to_scan = args.ports
     timeout_to_use = args.timeout
-    workers_to_use = args.workers
-    workers_display_str = str(workers_to_use) if workers_to_use is not None else "default"
+    cli_workers_val = args.workers # Value from CLI argument
+
+    # API expects 0 for default, CLI default is None. Convert None to 0 for API call.
+    api_workers_val = 0 if cli_workers_val is None else cli_workers_val
+    workers_display_str = str(cli_workers_val) if cli_workers_val is not None else "default (API=0)"
 
 
     results_dict: Dict[str, List[int]] = {}
@@ -101,7 +104,7 @@ def main():
             else:
                 single_ip_open_ports = scan_multiple_ports(args.ip, ports_to_scan,
                                                            timeout_seconds=timeout_to_use,
-                                                           max_workers=workers_to_use)
+                                                           max_workers=api_workers_val)
             if single_ip_open_ports:
                 results_dict[args.ip] = single_ip_open_ports
 
@@ -109,14 +112,14 @@ def main():
             print(f"Scanning IP range {args.ip_range} for ports: {ports_to_scan} (timeout: {timeout_to_use}s, workers: {workers_display_str})...")
             results_dict = scan_ip_range_ports(args.ip_range, ports_to_scan,
                                                timeout_seconds=timeout_to_use,
-                                               max_workers=workers_to_use)
+                                               max_workers=api_workers_val)
 
         elif args.ip_list:
             ip_definitions = [item.strip() for item in args.ip_list.split(',')]
             print(f"Scanning IP list {ip_definitions} for ports: {ports_to_scan} (timeout: {timeout_to_use}s, workers: {workers_display_str})...")
             results_dict = scan_ip_list_ports(ip_definitions, ports_to_scan,
                                               timeout_seconds=timeout_to_use,
-                                              max_workers=workers_to_use)
+                                              max_workers=api_workers_val)
 
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
