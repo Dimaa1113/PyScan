@@ -13,6 +13,9 @@ try:
         scan_ip_list_ports
     )
 except ImportError:
+    # This allows running cli.py directly for testing if port_scanner is in PYTHONPATH
+    # Or if cli.py is moved to the root and paths are adjusted.
+    # For proper package structure, the first import should work when installed.
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from port_scanner import (
         scan_single_port,
@@ -67,37 +70,53 @@ def main():
     parser.add_argument("-t", "--timeout", type=float, default=1.0,
                         help="Connection timeout in seconds for each port (default: 1.0). Must be positive.")
 
+    parser.add_argument("-w", "--workers", type=int, default=None,
+                        help="Number of worker threads for scanning "
+                             "(default: Python's ThreadPoolExecutor default, typically based on CPU cores).")
+
     args = parser.parse_args()
 
     if args.timeout <= 0:
         parser.error("argument -t/--timeout: must be a positive number")
 
+    if args.workers is not None and args.workers <= 0:
+        parser.error("argument -w/--workers: must be a positive integer")
+
     ports_to_scan = args.ports
     timeout_to_use = args.timeout
+    workers_to_use = args.workers
+    workers_display_str = str(workers_to_use) if workers_to_use is not None else "default"
+
 
     results_dict: Dict[str, List[int]] = {}
     single_ip_open_ports: List[int] = []
 
     try:
         if args.ip:
-            print(f"Scanning {args.ip} for ports: {ports_to_scan} (timeout: {timeout_to_use}s)...")
+            print(f"Scanning {args.ip} for ports: {ports_to_scan} (timeout: {timeout_to_use}s, workers: {workers_display_str})...")
             if len(ports_to_scan) == 1:
+                # For a single IP and single port, parallelization doesn't offer benefit.
                 if scan_single_port(args.ip, ports_to_scan[0], timeout_seconds=timeout_to_use):
                     single_ip_open_ports = [ports_to_scan[0]]
             else:
-                single_ip_open_ports = scan_multiple_ports(args.ip, ports_to_scan, timeout_seconds=timeout_to_use)
-
+                single_ip_open_ports = scan_multiple_ports(args.ip, ports_to_scan,
+                                                           timeout_seconds=timeout_to_use,
+                                                           max_workers=workers_to_use)
             if single_ip_open_ports:
                 results_dict[args.ip] = single_ip_open_ports
 
         elif args.ip_range:
-            print(f"Scanning IP range {args.ip_range} for ports: {ports_to_scan} (timeout: {timeout_to_use}s)...")
-            results_dict = scan_ip_range_ports(args.ip_range, ports_to_scan, timeout_seconds=timeout_to_use)
+            print(f"Scanning IP range {args.ip_range} for ports: {ports_to_scan} (timeout: {timeout_to_use}s, workers: {workers_display_str})...")
+            results_dict = scan_ip_range_ports(args.ip_range, ports_to_scan,
+                                               timeout_seconds=timeout_to_use,
+                                               max_workers=workers_to_use)
 
         elif args.ip_list:
             ip_definitions = [item.strip() for item in args.ip_list.split(',')]
-            print(f"Scanning IP list {ip_definitions} for ports: {ports_to_scan} (timeout: {timeout_to_use}s)...")
-            results_dict = scan_ip_list_ports(ip_definitions, ports_to_scan, timeout_seconds=timeout_to_use)
+            print(f"Scanning IP list {ip_definitions} for ports: {ports_to_scan} (timeout: {timeout_to_use}s, workers: {workers_display_str})...")
+            results_dict = scan_ip_list_ports(ip_definitions, ports_to_scan,
+                                              timeout_seconds=timeout_to_use,
+                                              max_workers=workers_to_use)
 
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
