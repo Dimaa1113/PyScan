@@ -20,7 +20,7 @@
 ```bash
 pip install cython # Если еще не установлен
 # pip install . # Если вы клонировали репозиторий
-# Или когда будет опубликован: pip install cython-port-scanner-ru
+# Или когда будет опубликован: pip install pyscan
 ```
 
 ### Pydroid (Android arm64)
@@ -32,7 +32,7 @@ pip install cython # Если еще не установлен
 2.  Убедитесь, что в Pydroid доступна среда для сборки C-компилятором. Обычно Pydroid предлагает установку "NDK" (Native Development Kit) или "build-essential" репозитория, который предоставляет Clang и другие необходимые инструменты. Проверьте настройки Pydroid или менеджер репозиториев.
 3.  После настройки среды сборки, вы можете установить библиотеку (когда она будет доступна на PyPI или из локального клона):
     ```bash
-    # pip install cython-port-scanner-ru
+    # pip install pyscan
     # или из локального клона:
     # pip install /path/to/cloned/repository
     ```
@@ -68,38 +68,38 @@ for ip, ports in results_list.items():
 
 ### Через интерфейс командной строки (CLI)
 
-После установки пакета, утилита `cython-port-scanner-ru` будет доступна в терминале.
+После установки пакета, утилита `pyscan` будет доступна в терминале.
 
 **Примеры:**
 
 - Сканировать один IP, один порт:
   ```bash
-  cython-port-scanner-ru --ip 192.168.1.1 -p 80
+  pyscan --ip 192.168.1.1 -p 80
   ```
 
 - Сканировать один IP, несколько портов:
   ```bash
-  cython-port-scanner-ru --ip 192.168.1.1 -p 80,443,8080
+  pyscan --ip 192.168.1.1 -p 80,443,8080
   ```
 
 - Сканировать один IP, диапазон портов:
   ```bash
-  cython-port-scanner-ru --ip 192.168.1.1 -p 1-1024
+  pyscan --ip 192.168.1.1 -p 1-1024
   ```
 
 - Сканировать диапазон IP, несколько портов:
   ```bash
-  cython-port-scanner-ru --ip-range 192.168.1.1-192.168.1.10 -p 22,80,443
+  pyscan --ip-range 192.168.1.1-192.168.1.10 -p 22,80,443
   ```
 
 - Сканировать список IP и диапазонов, несколько портов:
   ```bash
-  cython-port-scanner-ru --ip-list "192.168.1.1,10.0.0.5-10.0.0.10,8.8.8.8" -p 53,80
+  pyscan --ip-list "192.168.1.1,10.0.0.5-10.0.0.10,8.8.8.8" -p 53,80
   ```
 
 Для получения полной справки:
 ```bash
-cython-port-scanner-ru --help
+pyscan --help
 ```
 
 ## Вклад

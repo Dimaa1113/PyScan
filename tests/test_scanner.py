@@ -122,16 +122,26 @@ class TestPortParsing(unittest.TestCase):
     def test_parse_duplicate_ports(self):
         self.assertEqual(parse_ports("80,80,1-3,2"), [1, 2, 3, 80])
 
-    def test_invalid_port_string(self):
-        with self.assertRaises(argparse.ArgumentTypeError):
+    def test_parse_ports_invalid_non_numeric(self):
+        with self.assertRaisesRegex(argparse.ArgumentTypeError, "Invalid port specification: 'abc'"):
             parse_ports("abc")
-        with self.assertRaises(argparse.ArgumentTypeError):
+
+    def test_parse_ports_invalid_range_non_numeric(self):
+        with self.assertRaisesRegex(argparse.ArgumentTypeError, "Invalid port specification: '1-abc'"):
             parse_ports("1-abc")
-        with self.assertRaises(argparse.ArgumentTypeError):
+
+    def test_parse_ports_invalid_mixed_non_numeric(self):
+        with self.assertRaisesRegex(argparse.ArgumentTypeError, "Invalid port specification: '80,abc,443'"):
             parse_ports("80,abc,443")
-        with self.assertRaises(argparse.ArgumentTypeError):
-            parse_ports("") # Empty
-        with self.assertRaises(argparse.ArgumentTypeError):
+
+    def test_parse_ports_empty_string(self):
+        with self.assertRaisesRegex(argparse.ArgumentTypeError, "Port string cannot be empty."):
+            parse_ports("")
+
+    def test_parse_ports_invalid_trailing_comma(self):
+        # This case should be caught by int() failing on an empty string part,
+        # then wrapped by "Invalid port specification"
+        with self.assertRaisesRegex(argparse.ArgumentTypeError, "Invalid port specification: '1,'"):
             parse_ports("1,")
 
     def test_invalid_port_number(self):
@@ -273,7 +283,10 @@ class TestCLI(TestWithServerBase):
         self.assertIn(f"Open ports on {TEST_HOST}:", result.stdout)
         for port in TEST_OPEN_PORTS_LIST:
             self.assertIn(f"- {port}", result.stdout)
-        self.assertNotIn(str(TEST_CLOSED_PORT), result.stdout) # Check that closed port is not listed as open
+
+        # Check that TEST_CLOSED_PORT is not listed as an open port
+        open_port_lines = [line.strip() for line in result.stdout.split('\n') if line.strip().startswith("- ")]
+        self.assertNotIn(f"- {TEST_CLOSED_PORT}", open_port_lines)
 
     def test_cli_scan_ip_range(self):
         ports_str = ",".join(map(str, TEST_OPEN_PORTS_LIST))

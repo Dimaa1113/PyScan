@@ -35,7 +35,8 @@ def parse_ports(port_string: str) -> List[int]:
         for part in parts:
             part = part.strip()
             if not part:
-                continue
+                # Raise error if a part is empty after stripping (e.g., "1," or "1,,2")
+                raise ValueError("Port segment cannot be empty.")
             if '-' in part:
                 start_str, end_str = part.split('-', 1)
                 start = int(start_str)

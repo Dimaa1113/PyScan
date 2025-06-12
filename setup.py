@@ -14,7 +14,7 @@ extensions = [
 ]
 
 setup(
-    name="cython-port-scanner-ru", # Renamed for clarity
+    name="pyscan", # <--- Changed
     version="0.1.0",
     author="Jules (AI Agent)",
     author_email="none@example.com",
@@ -33,7 +33,7 @@ setup(
     # Define the command-line script
     entry_points={
         "console_scripts": [
-            "cython-port-scanner-ru=port_scanner.cli:main",
+            "pyscan=port_scanner.cli:main", # <--- Changed
         ],
     },
     # Specify Python version requirements
